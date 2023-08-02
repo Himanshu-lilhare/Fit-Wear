@@ -22,24 +22,86 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// src/server.ts
+// src/index.ts
+var import_express2 = __toESM(require("express"));
 var import_body_parser = require("body-parser");
-var import_express = __toESM(require("express"));
 var import_morgan = __toESM(require("morgan"));
 var import_cors = __toESM(require("cors"));
-var createServer = () => {
-  const app = (0, import_express.default)();
-  app.disable("x-powered-by").use((0, import_morgan.default)("dev")).use((0, import_body_parser.urlencoded)({ extended: true })).use((0, import_body_parser.json)()).use((0, import_cors.default)()).get("/message/:name", (req, res) => {
-    return res.json({ message: `hello ${req.params.name}` });
-  }).get("/healthz", (req, res) => {
-    return res.json({ ok: true });
+var import_dotenv = __toESM(require("dotenv"));
+
+// src/config/connectDb.ts
+var import_mongoose = __toESM(require("mongoose"));
+async function connectDb() {
+  try {
+    console.log("connectdb me a gaya");
+    const { connection } = await import_mongoose.default.connect("mongodb+srv://rajlilhare200:ZpdfoCcRrl8QFhLO@cluster0.yy4j67p.mongodb.net/?retryWrites=true&w=majority");
+    console.log(`server is connect with ${connection.port}`);
+  } catch (error) {
+    console.log("connect nahi hua");
+  }
+}
+
+// src/middleware/customerrorHandler.ts
+function CustomErrorHandler(err, req, res, next) {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Some Internel Error";
+  res.status(statusCode).json({
+    error: message
   });
-  return app;
+}
+
+// src/routes/product.ts
+var import_express = __toESM(require("express"));
+
+// src/middleware/tryCatchWrapper.ts
+var tryCatchWrapper = (callbackFunc) => {
+  return async (req, res, next) => {
+    try {
+      callbackFunc(req, res, next);
+    } catch (error) {
+      next();
+    }
+  };
 };
 
-// src/index.ts
-var port = process.env.PORT || 5001;
-var server = createServer();
-server.listen(port, () => {
-  console.log(`api running on ${port}`);
+// src/middleware/custumErrorClass.ts
+var CustomError = class extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+};
+
+// src/controller/product.ts
+var createproduct = tryCatchWrapper(async (req, res, next) => {
+  var _a;
+  const name = (_a = req == null ? void 0 : req.body) == null ? void 0 : _a.name;
+  if (!name)
+    next(new CustomError("Name nahi Dale APne", 400));
 });
+
+// src/routes/product.ts
+var productRouter = import_express.default.Router();
+productRouter.route("/createProduct").post(createproduct);
+var product_default = productRouter;
+
+// src/index.ts
+import_dotenv.default.config({
+  path: "./src/config/.env"
+});
+var app = (0, import_express2.default)();
+app.disable("x-powered-by");
+app.use((0, import_morgan.default)("dev"));
+app.use((0, import_body_parser.urlencoded)({ extended: true }));
+app.use((0, import_body_parser.json)());
+app.use((0, import_cors.default)());
+app.use(product_default);
+app.get("/message/:name", (req, res) => {
+  return res.json({ message: `hello ${req.params.name}` });
+});
+app.get("/healthz", (req, res) => {
+  return res.json({ ok: true });
+});
+app.use(CustomErrorHandler);
+connectDb();
+app.listen(process.env.PORT, () => console.log(`running at port ${process.env.PORT}`));
