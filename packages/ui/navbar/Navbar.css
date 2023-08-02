@@ -1,0 +1,9 @@
+.nav-wrapper{
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-link-wrapper{
+    display: flex;
+    align-items: center;
+}
