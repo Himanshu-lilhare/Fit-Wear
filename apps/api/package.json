@@ -2,7 +2,6 @@
   "name": "api",
   "version": "0.0.0",
   "private": true,
-
   "scripts": {
     "build": "tsup src/index.ts --format js",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -11,16 +10,18 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/dotenv": "^8.2.0",
     "@types/mongoose": "^5.11.97",
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.19.0",
+    "common": "*",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "mongoose": "^7.4.1",
     "morgan": "^1.10.0",
-    "zod": "^3.21.4",
-    "common": "*"
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",

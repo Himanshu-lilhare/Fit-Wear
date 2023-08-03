@@ -30,3 +30,11 @@ if(!isValid.success){
   console.log(createdProduct + "   product create ho gaya");
   res.status(200).json(createdProduct);
 })
+
+export const getAllProducts = tryCatchWrapper(async(req:Request,res:Response,next:NextFunction)=>{
+
+let products = await product.find({})
+
+res.status(200).json({products})
+
+})
