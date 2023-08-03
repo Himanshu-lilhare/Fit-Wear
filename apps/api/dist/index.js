@@ -53,17 +53,6 @@ function CustomErrorHandler(err, req, res, next) {
 // src/routes/product.ts
 var import_express = __toESM(require("express"));
 
-// src/middleware/tryCatchWrapper.ts
-var tryCatchWrapper = (callbackFunc) => {
-  return async (req, res, next) => {
-    try {
-      callbackFunc(req, res, next);
-    } catch (error) {
-      next();
-    }
-  };
-};
-
 // src/middleware/custumErrorClass.ts
 var CustomError = class extends Error {
   constructor(message, statusCode) {
@@ -72,12 +61,84 @@ var CustomError = class extends Error {
   }
 };
 
+// src/middleware/tryCatchWrapper.ts
+var tryCatchWrapper = (callbackFunc) => {
+  return async (req, res, next) => {
+    try {
+      await callbackFunc(req, res, next);
+    } catch (error) {
+      console.log("ayaha aaya");
+      next(new CustomError(error == null ? void 0 : error.message, 400));
+    }
+  };
+};
+
+// src/model/product.ts
+var import_mongoose2 = __toESM(require("mongoose"));
+var productSchema = new import_mongoose2.default.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  images: [
+    {
+      public_id: String,
+      url: String
+    }
+  ],
+  category: {
+    type: String,
+    required: [true, "Please enter Category"],
+    enums: {
+      value: ["t-shirts", "jeans"],
+      message: "Please select Correct category"
+    }
+  },
+  seller: {
+    type: String,
+    required: true
+  },
+  stock: {
+    type: Number,
+    required: true
+  },
+  ratings: {
+    type: Number,
+    default: 0
+  },
+  reviews: [{
+    comment: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now()
+    }
+  }]
+});
+var product = import_mongoose2.default.models.product || import_mongoose2.default.model("product", productSchema);
+
 // src/controller/product.ts
+var import_common = require("common");
 var createproduct = tryCatchWrapper(async (req, res, next) => {
-  var _a;
-  const name = (_a = req == null ? void 0 : req.body) == null ? void 0 : _a.name;
-  if (!name)
-    next(new CustomError("Name nahi Dale APne", 400));
+  const isValid = import_common.createProductBody.safeParse(req.body);
+  if (!isValid.success) {
+    return next(new CustomError(isValid.error.errors[0].message.toString(), 400));
+  }
+  console.log("creaproduct karne aaya");
+  const productData = req.body;
+  const createdProduct = await product.create(productData);
+  console.log(createdProduct + "   product create ho gaya");
+  res.status(200).json(createdProduct);
 });
 
 // src/routes/product.ts

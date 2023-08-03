@@ -40,11 +40,7 @@ const productSchema = new mongoose.Schema({
       default:0
     },
     reviews:[{
-      ratings:{
-          type:Number,
-          required:true
-      },
-      comment:{
+     comment:{
           type:String,
           required:true
       },
@@ -55,5 +51,5 @@ const productSchema = new mongoose.Schema({
     }]
   });
   
-  export const product=  mongoose.models.product||mongoose.model('product',productSchema)
+  export const product =  mongoose.models.product||mongoose.model('product',productSchema)
   

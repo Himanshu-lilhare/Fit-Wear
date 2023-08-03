@@ -3,9 +3,9 @@ import { json, urlencoded } from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from 'dotenv'
-import {connectDb} from "./config/connectDb"
-import { CustomErrorHandler } from "./middleware/customerrorHandler";
-import productRouter from "./routes/product";
+import {connectDb} from "./config/connectDb.js"
+import { CustomErrorHandler } from "./middleware/customerrorHandler.js";
+import productRouter from "./routes/product.js";
 dotenv.config({
   path: "./src/config/.env",
 });

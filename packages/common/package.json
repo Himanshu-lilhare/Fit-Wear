@@ -1,0 +1,26 @@
+{
+  "name": "common",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
+    "dev": "tsc -w"
+   
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+
+    "typescript": "^4.8.3"
+  }
+}

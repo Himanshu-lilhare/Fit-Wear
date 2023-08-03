@@ -2,8 +2,9 @@
   "name": "api",
   "version": "0.0.0",
   "private": true,
+
   "scripts": {
-    "build": "tsup src/index.ts --format cjs",
+    "build": "tsup src/index.ts --format js",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "tsup src/index.ts --format cjs --watch --onSuccess \"node dist/index.js\"",
     "lint": "tsc --noEmit && eslint \"src/**/*.ts*\"",
@@ -17,7 +18,9 @@
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "mongoose": "^7.4.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "zod": "^3.21.4",
+    "common": "*"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",
