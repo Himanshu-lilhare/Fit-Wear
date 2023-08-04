@@ -1,6 +1,12 @@
+import {z} from 'zod'
 
-import {z} from "zod"
+// deleteProduct
+const deleteProductArray = z.object({})
+export const deleteProductBody = z.array(deleteProductArray)
+export type deleteProductParam = z.infer<typeof deleteProductBody>
 
+
+// createProduct
 export const createProductBody = z.object({
     name: z.string().min(1).max(40),
     description: z.string().min(20),
@@ -14,3 +20,5 @@ export const createProductBody = z.object({
       }).optional(),
 
 })
+
+export type createProductParams = z.infer<typeof createProductBody>

@@ -1,4 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
+export declare const deleteProductBody: z.ZodArray<z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>, "many">;
+export type deleteProductParam = z.infer<typeof deleteProductBody>;
 export declare const createProductBody: z.ZodObject<{
     name: z.ZodString;
     description: z.ZodString;
@@ -38,4 +40,4 @@ export declare const createProductBody: z.ZodObject<{
     } | undefined;
 }>;
 export type createProductParams = z.infer<typeof createProductBody>;
-//# sourceMappingURL=createProductBody.d.ts.map
+//# sourceMappingURL=ProductSchemas.d.ts.map

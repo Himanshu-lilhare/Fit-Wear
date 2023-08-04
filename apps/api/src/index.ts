@@ -7,6 +7,7 @@ import {connectDb} from "./config/connectDb.js"
 import { CustomErrorHandler } from "./middleware/customerrorHandler.js";
 import productRouter from "./routes/product.js";
 import adminRouter from "./routes/admin.js";
+import userRouter from "./routes/user.js";
 dotenv.config({
   path: "./src/config/.env",
 });
@@ -19,6 +20,7 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(cors());
 app.use(productRouter)
+app.use(userRouter)
 app.use(adminRouter)
 app.get("/message/:name", (req, res) => {
   return res.json({ message: `hello ${req.params.name}` });
