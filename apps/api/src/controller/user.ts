@@ -133,3 +133,17 @@ export const deleteFromCart = tryCatchWrapper(
     });
   }
 );
+
+export const getUserCart = tryCatchWrapper(async(req:Request,res:Response,next:NextFunction)=>{
+
+const {userId} = req.body 
+
+if(!userId) return next(new CustomError("You are Not LoggedIn",400))
+
+let user = await userModel.findById(userId).populate('cart.oneProduct')
+let userCart = user?.cart
+res.status(200).json({
+   userCart
+})
+
+})

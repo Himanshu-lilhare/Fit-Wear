@@ -360,12 +360,23 @@ var deleteFromCart = tryCatchWrapper(
     });
   }
 );
+var getUserCart = tryCatchWrapper(async (req, res, next) => {
+  const { userId } = req.body;
+  if (!userId)
+    return next(new CustomError("You are Not LoggedIn", 400));
+  let user = await userModel.findById(userId).populate("cart.oneProduct");
+  let userCart = user == null ? void 0 : user.cart;
+  res.status(200).json({
+    userCart
+  });
+});
 
 // src/routes/user.ts
 var userRouter = (0, import_express3.Router)();
 userRouter.route("/register").post(registerUser);
 userRouter.route("/addToCart").post(addToCart);
 userRouter.route("/deleteFromcart").delete(deleteFromCart);
+userRouter.route("/getCartItems").get(getUserCart);
 var user_default = userRouter;
 
 // src/index.ts
