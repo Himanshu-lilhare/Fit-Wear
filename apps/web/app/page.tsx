@@ -1,13 +1,10 @@
-import { Button, Header, Firstsample  } from "ui";
-
+import {Home} from "ui"
 export default function Page() {
  
   return (
     <>
-      <Header text="Web" />
-      <Button />
-      <Firstsample/>
- 
+     
+ <Home/>
     </>
   );
 }

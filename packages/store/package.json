@@ -1,0 +1,16 @@
+{
+  "name": "store",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "dev": "tsc -w",
+    "start": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/recoil": "^0.0.9",
+    "recoil": "^0.7.7"
+  }
+}

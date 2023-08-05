@@ -1,0 +1,28 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root{
+    --primary-textcolor:#E0E0E0;
+    --background-color:#171717;
+}
+html,body{
+    font-size: 10px;
+    background-color: var(--background-color);
+     color: var(--primary-textcolor);
+    
+}
+
+@media (max-width:656px) {
+   html,body{
+    font-size: 7px;
+   }
+}
+
+@media (max-width:458px) {
+    html,body{
+     font-size: 6px;
+    }
+ }
+ 
