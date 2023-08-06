@@ -5,5 +5,4 @@ const productRouter = express.Router()
 
 productRouter.route('/createProduct').post(createproduct)
 productRouter.route('/getProducts').get(getAllProducts)
-
 export default productRouter

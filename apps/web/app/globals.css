@@ -13,6 +13,9 @@ html,body{
      color: var(--primary-textcolor);
     
 }
+.border{
+    border: 1px solid white;
+}
 
 @media (max-width:656px) {
    html,body{

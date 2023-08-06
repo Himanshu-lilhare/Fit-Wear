@@ -198,8 +198,7 @@ var userSchema = new import_mongoose4.default.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 6,
-      select: false
+      minlength: 6
     },
     avatar: {
       public_id: String,
@@ -256,6 +255,8 @@ var userModel = ((_b = (_a = import_mongoose4.default) == null ? void 0 : _a.mod
 
 // src/controller/user.ts
 var import_mongoose5 = __toESM(require("mongoose"));
+var import_bcrypt2 = __toESM(require("bcrypt"));
+var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
 var registerUser = tryCatchWrapper(
   async (req, res, next) => {
     const isValid = import_common3.registerUserBody.safeParse(req.body);
@@ -267,6 +268,30 @@ var registerUser = tryCatchWrapper(
       return res.status(401).send({ message: "user already exists" });
     let newUser = await userModel.create({ email, password, name });
     res.send({ user: newUser, message: "user created successfully" });
+  }
+);
+var loginUser = tryCatchWrapper(
+  async (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return next(new CustomError("Please Provide Credentials", 400));
+    let user = await userModel.findOne({ email }).lean();
+    if (!user)
+      return next(new CustomError("Please Provide Right Credentials", 400));
+    let isCorrectPassword = import_bcrypt2.default.compare(password, user.password);
+    if (!isCorrectPassword)
+      return next(new CustomError("Please Provide Right Creedentials", 400));
+    let token = generateJwtToken(user._id.toString(), process.env.SECRET_KEY);
+    if (!token)
+      return next(new CustomError("Some Prolbem To make Token", 400));
+    const { password: pass, ...userWithoutPassword } = user;
+    res.status(200).cookie("token", token, {
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1e3),
+      httpOnly: true,
+      secure: true
+    }).json({
+      message: "loggedin Successfully"
+    });
   }
 );
 var addToCart = tryCatchWrapper(
@@ -304,7 +329,9 @@ var addToCart = tryCatchWrapper(
       if (!user2) {
         return next(new CustomError("User not found.", 404));
       }
-      const cartItemIndex = user2.cart.findIndex((item) => item.oneProduct.toString() === req.body.productId.toString());
+      const cartItemIndex = user2.cart.findIndex(
+        (item) => item.oneProduct.toString() === req.body.productId.toString()
+      );
       if (cartItemIndex === -1) {
         return next(new CustomError("Product not found in cart.", 404));
       }
@@ -315,7 +342,9 @@ var addToCart = tryCatchWrapper(
         user: updatedUser
       });
       if (!updatedUser) {
-        return next(new CustomError("User not found or product not in cart.", 400));
+        return next(
+          new CustomError("User not found or product not in cart.", 400)
+        );
       }
       res.status(200).json({
         message: "Quantity updated successfully",
@@ -360,16 +389,24 @@ var deleteFromCart = tryCatchWrapper(
     });
   }
 );
-var getUserCart = tryCatchWrapper(async (req, res, next) => {
-  const { userId } = req.body;
-  if (!userId)
-    return next(new CustomError("You are Not LoggedIn", 400));
-  let user = await userModel.findById(userId).populate("cart.oneProduct");
-  let userCart = user == null ? void 0 : user.cart;
-  res.status(200).json({
-    userCart
+var getUserCart = tryCatchWrapper(
+  async (req, res, next) => {
+    const { userId } = req.body;
+    if (!userId)
+      return next(new CustomError("You are Not LoggedIn", 400));
+    let user = await userModel.findById(userId).populate("cart.oneProduct");
+    let userCart = user == null ? void 0 : user.cart;
+    res.status(200).json({
+      userCart
+    });
+  }
+);
+function generateJwtToken(userId, secret_key) {
+  const token = import_jsonwebtoken.default.sign({ _id: userId }, secret_key, {
+    expiresIn: "24h"
   });
-});
+  return token;
+}
 
 // src/routes/user.ts
 var userRouter = (0, import_express3.Router)();
@@ -377,6 +414,7 @@ userRouter.route("/register").post(registerUser);
 userRouter.route("/addToCart").post(addToCart);
 userRouter.route("/deleteFromcart").delete(deleteFromCart);
 userRouter.route("/getCartItems").get(getUserCart);
+userRouter.route("/login").get(loginUser);
 var user_default = userRouter;
 
 // src/index.ts

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Document, Schema } from 'mongoose';
 export declare const registerUserBody: z.ZodObject<{
     name: z.ZodString;
     email: z.ZodString;
@@ -38,4 +39,34 @@ export declare const deleteFromCartBody: z.ZodObject<{
     productId: string;
 }>;
 export type DeleteFromCart = z.infer<typeof addToCartBody>;
+interface Address {
+    street: string;
+    city: string;
+    state: string;
+    phone: string;
+    zipcode: string;
+    country: string;
+    createdAt: Date;
+}
+interface Cart {
+    oneProduct: Schema.Types.ObjectId;
+    qty?: number;
+}
+export interface UserDocument extends Document {
+    name: string;
+    email: string;
+    password: string;
+    avatar?: {
+        public_id: string;
+        url: string;
+    };
+    role: 'user' | 'admin';
+    address?: Address[];
+    cart?: Cart[];
+    forgotPasswordToken?: string;
+    forgotPasswordExpiry?: Date;
+    verifyToken?: string;
+    verifyTokenExpiry?: Date;
+}
+export {};
 //# sourceMappingURL=UserSchemas.d.ts.map

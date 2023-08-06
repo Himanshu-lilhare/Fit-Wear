@@ -21,7 +21,7 @@ export const Navbar = () => {
           <NavHead />
         </div>
         <div className="nav-link-wrapper">
-          <div className={menu ? 'first-links first-links-d-flex' : 'first-links first-links-d-none'  }>
+          <div className={menu ? 'first-links first-links-d-flex' : 'first-links-d-none'  }>
             <Link href={"/"}>Home</Link>
             <Link href={"/shop"}>Shop</Link>
           </div>

@@ -1,0 +1,27 @@
+.home{
+    min-height: 100vh;
+    border: 1px solid white;
+    padding: 7rem 5rem 3rem 5rem;
+}
+.main-wrapper{
+    min-height: 80vh;
+    display: flex;
+    padding: 3rem;
+    justify-content: space-around;
+    gap: 1rem;
+}
+.main-wrapper-left-aside{
+    background-color: var(--primary-textcolor);
+    flex: 1;
+    position: relative;
+}
+.main-wrapper-right-aside{
+    background-color: var(--primary-textcolor);
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+}
+.main-wrapper-center{
+    flex: 1;
+}

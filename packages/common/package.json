@@ -12,15 +12,15 @@
     "build": "tsc",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "dev": "tsc -w"
-   
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/mongoose": "^5.11.97",
+    "mongoose": "^7.4.2",
     "zod": "^3.21.4"
   },
   "devDependencies": {
-
     "typescript": "^4.8.3"
   }
 }
