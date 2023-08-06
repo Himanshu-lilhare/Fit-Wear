@@ -8,6 +8,7 @@ import { CustomErrorHandler } from "./middleware/customerrorHandler.js";
 import productRouter from "./routes/product.js";
 import adminRouter from "./routes/admin.js";
 import userRouter from "./routes/user.js";
+import cookieParser from "cookie-parser";
 dotenv.config({
   path: "./src/config/.env",
 });
@@ -19,6 +20,7 @@ app.use(morgan("dev"));
 app.use(urlencoded({ extended: true }));
 app.use(json());
 app.use(cors());
+app.use(cookieParser())
 app.use(productRouter)
 app.use(userRouter)
 app.use(adminRouter)

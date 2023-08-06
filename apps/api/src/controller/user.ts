@@ -42,9 +42,9 @@ export const loginUser = tryCatchWrapper(
     const {password:pass,...userWithoutPassword} = user
 
 
-    res.status(200).cookie('token',token,{
+    res.status(200).cookie('fit_wear_token',token,{
       expires: new Date((Date.now() + 24*60*60*1000)),
-      httpOnly:true,
+      httpOnly:true,  
       secure:true,
 
     }).json({

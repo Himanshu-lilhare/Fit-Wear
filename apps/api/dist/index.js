@@ -145,10 +145,24 @@ var getAllProducts = tryCatchWrapper(async (req, res, next) => {
   res.status(200).json({ products });
 });
 
+// src/middleware/Authenticae.ts
+var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var AuthenticateUser = tryCatchWrapper((req, res, next) => {
+  var _a2;
+  console.log("yaha aaya");
+  let tokenFromReq = req.cookies.fit_wear_token || ((_a2 = req.headers.authorization) == null ? void 0 : _a2.split("Bearer")[1]);
+  console.log(tokenFromReq);
+  if (!tokenFromReq)
+    return next(new CustomError("You Are Not LoggedIn", 400));
+  let decoded = import_jsonwebtoken.default.verify(tokenFromReq, process.env.SECRET_KEY);
+  console.log(decoded);
+  next();
+});
+
 // src/routes/product.ts
 var productRouter = import_express.default.Router();
 productRouter.route("/createProduct").post(createproduct);
-productRouter.route("/getProducts").get(getAllProducts);
+productRouter.route("/getProducts").get(AuthenticateUser, getAllProducts);
 var product_default = productRouter;
 
 // src/routes/admin.ts
@@ -256,7 +270,7 @@ var userModel = ((_b = (_a = import_mongoose4.default) == null ? void 0 : _a.mod
 // src/controller/user.ts
 var import_mongoose5 = __toESM(require("mongoose"));
 var import_bcrypt2 = __toESM(require("bcrypt"));
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
+var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
 var registerUser = tryCatchWrapper(
   async (req, res, next) => {
     const isValid = import_common3.registerUserBody.safeParse(req.body);
@@ -285,7 +299,7 @@ var loginUser = tryCatchWrapper(
     if (!token)
       return next(new CustomError("Some Prolbem To make Token", 400));
     const { password: pass, ...userWithoutPassword } = user;
-    res.status(200).cookie("token", token, {
+    res.status(200).cookie("fit_wear_token", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1e3),
       httpOnly: true,
       secure: true
@@ -402,7 +416,7 @@ var getUserCart = tryCatchWrapper(
   }
 );
 function generateJwtToken(userId, secret_key) {
-  const token = import_jsonwebtoken.default.sign({ _id: userId }, secret_key, {
+  const token = import_jsonwebtoken2.default.sign({ _id: userId }, secret_key, {
     expiresIn: "24h"
   });
   return token;
@@ -418,6 +432,7 @@ userRouter.route("/login").get(loginUser);
 var user_default = userRouter;
 
 // src/index.ts
+var import_cookie_parser = __toESM(require("cookie-parser"));
 import_dotenv.default.config({
   path: "./src/config/.env"
 });
@@ -427,6 +442,7 @@ app.use((0, import_morgan.default)("dev"));
 app.use((0, import_body_parser.urlencoded)({ extended: true }));
 app.use((0, import_body_parser.json)());
 app.use((0, import_cors.default)());
+app.use((0, import_cookie_parser.default)());
 app.use(product_default);
 app.use(user_default);
 app.use(admin_default);

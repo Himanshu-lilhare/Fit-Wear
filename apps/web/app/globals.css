@@ -17,6 +17,10 @@ html,body{
     border: 1px solid white;
 }
 
+.pad{
+    padding: 7rem 3rem;
+}
+
 @media (max-width:656px) {
    html,body{
     font-size: 7px;
