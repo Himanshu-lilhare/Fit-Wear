@@ -9,7 +9,7 @@ export const AllProducts = async() => {
         }
     })
     const {products} = await data.json()
-    console.log(products)
+   
     
 
   return (
