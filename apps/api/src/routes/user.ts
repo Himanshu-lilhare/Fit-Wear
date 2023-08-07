@@ -8,7 +8,7 @@ userRouter.route('/register').post(registerUser)
 userRouter.route('/addToCart').post(addToCart)
 userRouter.route('/deleteFromcart').delete(deleteFromCart)
 userRouter.route('/getCartItems').get(getUserCart)
-userRouter.route('/login').get(loginUser)
+userRouter.route('/login').post(loginUser)
 
 
 

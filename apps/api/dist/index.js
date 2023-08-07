@@ -271,6 +271,7 @@ var userModel = ((_b = (_a = import_mongoose4.default) == null ? void 0 : _a.mod
 var import_mongoose5 = __toESM(require("mongoose"));
 var import_bcrypt2 = __toESM(require("bcrypt"));
 var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
+var import_cookie = require("cookie");
 var registerUser = tryCatchWrapper(
   async (req, res, next) => {
     const isValid = import_common3.registerUserBody.safeParse(req.body);
@@ -299,12 +300,14 @@ var loginUser = tryCatchWrapper(
     if (!token)
       return next(new CustomError("Some Prolbem To make Token", 400));
     const { password: pass, ...userWithoutPassword } = user;
-    res.status(200).cookie("fit_wear_token", token, {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1e3),
+    res.setHeader("Set-Cookie", (0, import_cookie.serialize)("fit_wear_token", token, {
+      path: "/",
       httpOnly: true,
-      secure: true
-    }).json({
-      message: "loggedin Successfully"
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1e3)
+    }));
+    res.status(200).json({
+      message: "loggedin Successfully",
+      user
     });
   }
 );
@@ -428,7 +431,7 @@ userRouter.route("/register").post(registerUser);
 userRouter.route("/addToCart").post(addToCart);
 userRouter.route("/deleteFromcart").delete(deleteFromCart);
 userRouter.route("/getCartItems").get(getUserCart);
-userRouter.route("/login").get(loginUser);
+userRouter.route("/login").post(loginUser);
 var user_default = userRouter;
 
 // src/index.ts
@@ -441,7 +444,7 @@ app.disable("x-powered-by");
 app.use((0, import_morgan.default)("dev"));
 app.use((0, import_body_parser.urlencoded)({ extended: true }));
 app.use((0, import_body_parser.json)());
-app.use((0, import_cors.default)());
+app.use((0, import_cors.default)({ origin: "http://localhost:3000", credentials: true }));
 app.use((0, import_cookie_parser.default)());
 app.use(product_default);
 app.use(user_default);

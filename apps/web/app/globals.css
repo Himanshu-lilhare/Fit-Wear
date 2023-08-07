@@ -11,8 +11,10 @@ html,body{
     font-size: 10px;
     background-color: var(--background-color);
      color: var(--primary-textcolor);
+     scroll-behavior: smooth;
     
 }
+
 .border{
     border: 1px solid white;
 }

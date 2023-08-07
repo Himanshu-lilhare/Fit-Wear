@@ -1,1 +1,1 @@
-{"version":3,"file":"userAtom.d.ts","sourceRoot":"","sources":["../../src/atoms/userAtom.ts"],"names":[],"mappings":"AAGA,eAAO,MAAM,QAAQ;;;;;EAQnB,CAAA"}
+{"version":3,"file":"userAtom.d.ts","sourceRoot":"","sources":["../../src/atoms/userAtom.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,YAAY,EAAE,MAAM,QAAQ,CAAC;AAEtC,KAAK,aAAa,GAAG;IACnB,eAAe,EAAC,OAAO,CAAA;IACvB,IAAI,EAAE,YAAY,GAAG,EAAE,CAAC;CACzB,CAAC;AACF,eAAO,MAAM,QAAQ,6CAMnB,CAAC;AAEH,eAAO,MAAM,uBAAuB,+CAMlC,CAAA"}

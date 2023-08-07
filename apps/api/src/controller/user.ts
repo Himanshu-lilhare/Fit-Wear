@@ -8,6 +8,8 @@ import { product } from "../model/product";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserDocument } from "common";
+import { serialize } from "cookie"
+
 export const registerUser = tryCatchWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const isValid = registerUserBody.safeParse(req.body);
@@ -41,15 +43,14 @@ export const loginUser = tryCatchWrapper(
 
     const {password:pass,...userWithoutPassword} = user
 
-
-    res.status(200).cookie('fit_wear_token',token,{
-      expires: new Date((Date.now() + 24*60*60*1000)),
-      httpOnly:true,  
-      secure:true,
-
-    }).json({
+    res.setHeader('Set-Cookie',serialize('fit_wear_token',token,{
+      path:'/',
+      httpOnly:true,
+      expires: new Date((Date.now() + 24*60*60*1000))
+  }))
+    res.status(200).json({
       message:'loggedin Successfully',
-
+      user
     })
   }
 );
