@@ -1,8 +1,8 @@
 import "./home.css"
 import Image from "next/image"
-import {cookies} from "next/headers"
+
 export const Home = () => {
-  console.log(cookies()?.get("token")?.value +" ye rahi cookie ui me")
+  
   return (
     <main className="home">
 

@@ -1,3 +1,4 @@
+import { Document } from 'mongoose';
 import { z } from 'zod';
 export declare const deleteProductBody: z.ZodArray<z.ZodObject<{}, "strip", z.ZodTypeAny, {}, {}>, "many">;
 export type deleteProductParam = z.infer<typeof deleteProductBody>;
@@ -40,4 +41,23 @@ export declare const createProductBody: z.ZodObject<{
     } | undefined;
 }>;
 export type createProductParams = z.infer<typeof createProductBody>;
+interface Review {
+    comment: string;
+    createdAt: Date;
+}
+export interface ProductType extends Document {
+    name: string;
+    description: string;
+    price: number;
+    images?: Array<{
+        public_id: string;
+        url: string;
+    }>;
+    category: string;
+    seller: string;
+    stock: number;
+    ratings: number;
+    reviews?: Review[];
+}
+export {};
 //# sourceMappingURL=ProductSchemas.d.ts.map

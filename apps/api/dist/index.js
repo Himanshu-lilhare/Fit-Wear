@@ -221,20 +221,25 @@ var _a, _b;
 var userModel = ((_b = (_a = import_mongoose3.default) == null ? void 0 : _a.models) == null ? void 0 : _b.user) || import_mongoose3.default.model("user", userSchema);
 
 // src/middleware/Authenticae.ts
-var AuthenticateUser = tryCatchWrapper(async (req, res, next) => {
-  var _a2;
-  console.log("yaha aaya");
-  let tokenFromReq = req.cookies.fit_wear_token || ((_a2 = req.headers.authorization) == null ? void 0 : _a2.split("Bearer")[1]);
-  console.log(tokenFromReq);
-  if (!tokenFromReq)
-    return next(new CustomError("You Are Not LoggedIn", 400));
-  let decoded = import_jsonwebtoken.default.verify(tokenFromReq, process.env.SECRET_KEY);
-  let user = await userModel.findById({ _id: decoded._id });
-  if (!user)
-    return next(new CustomError("You are Providning Wrong Token", 400));
-  req.headers["user"] = user;
-  next();
-});
+var AuthenticateUser = tryCatchWrapper(
+  async (req, res, next) => {
+    let tokenFromReq;
+    if (req.cookies.fit_wear_token) {
+      tokenFromReq = req.cookies.fit_wear_token;
+    } else {
+      console.log("else me hai");
+      tokenFromReq = req.headers.authorization;
+    }
+    if (!tokenFromReq)
+      return next(new CustomError("You Are Not LoggedIn", 400));
+    let decoded = import_jsonwebtoken.default.verify(tokenFromReq, process.env.SECRET_KEY);
+    let user = await userModel.findById({ _id: decoded._id });
+    if (!user)
+      return next(new CustomError("You are Providning Wrong Token", 400));
+    req.headers["user"] = user;
+    next();
+  }
+);
 
 // src/routes/product.ts
 var productRouter = import_express.default.Router();

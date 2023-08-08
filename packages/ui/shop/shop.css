@@ -1,0 +1,13 @@
+
+.products-div{
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+align-items: flex-start;
+gap: 7rem;
+font-size: 20px;
+}
+.product-div{
+    min-height: 25rem;
+    min-width: 25rem;
+}

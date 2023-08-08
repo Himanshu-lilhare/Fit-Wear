@@ -1,3 +1,4 @@
+import { Document } from 'mongoose'
 import {z} from 'zod'
 
 // deleteProduct
@@ -22,3 +23,24 @@ export const createProductBody = z.object({
 })
 
 export type createProductParams = z.infer<typeof createProductBody>
+
+
+interface Review {
+  comment: string;
+  createdAt: Date;
+}
+
+export interface ProductType extends Document {
+  name: string;
+  description: string;
+  price: number;
+  images?: Array<{
+    public_id: string;
+    url: string;
+  }>;
+  category: string;
+  seller: string;
+  stock: number;
+  ratings: number;
+  reviews?: Review[];
+}

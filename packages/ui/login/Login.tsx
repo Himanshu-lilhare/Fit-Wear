@@ -1,20 +1,23 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { DevTool } from "@hookform/devtools";
-import { serverLink, userAtom } from "store";
+import { userAtom } from "store";
 import axios from "axios";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
+import { serverLink } from "../ServerLink";
+
 
 type LoginForm = {
   email: string;
   password: string;
 };
-let render = 0;
+
 export const Login = () => {
-  const [user,setUser]=useRecoilState(userAtom)
+  const setUser = useSetRecoilState(userAtom);
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<LoginForm>();
+  const router = useRouter();
 
   const { handleSubmit, formState } = form;
   const { errors } = formState;
@@ -24,24 +27,28 @@ export const Login = () => {
     try {
       setLoading(true);
 
-      render++;
-      const res = await axios.post(`${serverLink}/login`, {
-        email:data.email,
-        password:data.password,
-      },{
-        headers : {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*', // Replace with the allowed origin
+      const res = await axios.post(
+        `${serverLink}/login`,
+        {
+          email: data.email,
+          password: data.password,
         },
-        withCredentials:true
-      })
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*", // Replace with the allowed origin
+          },
+          withCredentials: true,
+        }
+      );
 
       console.log("Authentictae true ", res);
 
       setLoading(false);
-      setUser({isAuthenticated:true,user:res?.data?.user})
+      setUser({ isAuthenticated: true, user: res?.data?.user });
+      router.push("/");
     } catch (error) {
-      console.log("error")
+      console.log("error");
       setLoading(false);
     }
   }
@@ -87,10 +94,7 @@ export const Login = () => {
           />
           <p>{errors.password?.message}</p>
         </div>
-        <button type="submit">
-          {" "}
-          {loading ? "Loading...." : "LogIn"} {render}
-        </button>
+        <button type="submit"> {loading ? "Loading...." : "LogIn"}</button>
       </form>
     </>
   );
