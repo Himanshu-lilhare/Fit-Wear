@@ -55,6 +55,15 @@ export const loginUser = tryCatchWrapper(
   }
 );
 
+export const logoutUser = tryCatchWrapper(  async (req: Request, res: Response, next: NextFunction) => {
+
+  
+  res.status(200).clearCookie("fit_wear_token").json({
+    message:"LoggedOut Successfully"
+  })
+
+})
+
 export const addToCart = tryCatchWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
     const isValid = addToCartBody.safeParse(req.body);
@@ -180,6 +189,17 @@ export const getUserCart = tryCatchWrapper(
   }
 );
 
+export const getUser = tryCatchWrapper(async (req: Request, res: Response, next: NextFunction) => {
+
+  const user = req.headers["user"]
+
+  if(!user) next(new CustomError("You ARe Not LoggedIn",400))
+
+  res.status(200).json({
+    user
+  })
+
+})
 function generateJwtToken(userId: string, secret_key: string):string{
   const token = jwt.sign({ _id: userId }, secret_key, {
     expiresIn: "24h",

@@ -147,58 +147,11 @@ var getAllProducts = tryCatchWrapper(async (req, res, next) => {
 
 // src/middleware/Authenticae.ts
 var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
-var AuthenticateUser = tryCatchWrapper((req, res, next) => {
-  var _a2;
-  console.log("yaha aaya");
-  let tokenFromReq = req.cookies.fit_wear_token || ((_a2 = req.headers.authorization) == null ? void 0 : _a2.split("Bearer")[1]);
-  console.log(tokenFromReq);
-  if (!tokenFromReq)
-    return next(new CustomError("You Are Not LoggedIn", 400));
-  let decoded = import_jsonwebtoken.default.verify(tokenFromReq, process.env.SECRET_KEY);
-  console.log(decoded);
-  next();
-});
-
-// src/routes/product.ts
-var productRouter = import_express.default.Router();
-productRouter.route("/createProduct").post(createproduct);
-productRouter.route("/getProducts").get(AuthenticateUser, getAllProducts);
-var product_default = productRouter;
-
-// src/routes/admin.ts
-var import_express2 = __toESM(require("express"));
-
-// src/controller/admin.ts
-var import_common2 = require("common");
-var import_mongoose3 = __toESM(require("mongoose"));
-var deleteProducts = tryCatchWrapper(async (req, res, next) => {
-  var _a2, _b2;
-  if (!((_a2 = req.body) == null ? void 0 : _a2.deleteProducts))
-    return next(new CustomError("Please Provide Which Product You Want to Delete", 400));
-  const objectIds = (_b2 = req.body) == null ? void 0 : _b2.deleteProducts.map((product2) => new import_mongoose3.default.Types.ObjectId(product2));
-  console.log(objectIds);
-  const isValid = import_common2.deleteProductBody.safeParse(objectIds);
-  if (!isValid.success)
-    return next(new CustomError(isValid.error.errors[0].message, 400));
-  const deleted = await product.deleteMany({ _id: { $in: objectIds } });
-  res.status(201).json({ message: "Products Deleted" });
-});
-
-// src/routes/admin.ts
-var adminRouter = import_express2.default.Router();
-adminRouter.route("/deleteProducts").delete(deleteProducts);
-var admin_default = adminRouter;
-
-// src/routes/user.ts
-var import_express3 = require("express");
-
-// src/controller/user.ts
-var import_common3 = require("common");
 
 // src/model/user.ts
-var import_mongoose4 = __toESM(require("mongoose"));
+var import_mongoose3 = __toESM(require("mongoose"));
 var import_bcrypt = __toESM(require("bcrypt"));
-var userSchema = new import_mongoose4.default.Schema(
+var userSchema = new import_mongoose3.default.Schema(
   {
     name: {
       type: String,
@@ -240,7 +193,7 @@ var userSchema = new import_mongoose4.default.Schema(
     cart: [
       {
         oneProduct: {
-          type: import_mongoose4.default.Schema.Types.ObjectId,
+          type: import_mongoose3.default.Schema.Types.ObjectId,
           ref: "product"
         },
         qty: {
@@ -265,9 +218,59 @@ userSchema.pre("save", async function(next) {
   next();
 });
 var _a, _b;
-var userModel = ((_b = (_a = import_mongoose4.default) == null ? void 0 : _a.models) == null ? void 0 : _b.user) || import_mongoose4.default.model("user", userSchema);
+var userModel = ((_b = (_a = import_mongoose3.default) == null ? void 0 : _a.models) == null ? void 0 : _b.user) || import_mongoose3.default.model("user", userSchema);
+
+// src/middleware/Authenticae.ts
+var AuthenticateUser = tryCatchWrapper(async (req, res, next) => {
+  var _a2;
+  console.log("yaha aaya");
+  let tokenFromReq = req.cookies.fit_wear_token || ((_a2 = req.headers.authorization) == null ? void 0 : _a2.split("Bearer")[1]);
+  console.log(tokenFromReq);
+  if (!tokenFromReq)
+    return next(new CustomError("You Are Not LoggedIn", 400));
+  let decoded = import_jsonwebtoken.default.verify(tokenFromReq, process.env.SECRET_KEY);
+  let user = await userModel.findById({ _id: decoded._id });
+  if (!user)
+    return next(new CustomError("You are Providning Wrong Token", 400));
+  req.headers["user"] = user;
+  next();
+});
+
+// src/routes/product.ts
+var productRouter = import_express.default.Router();
+productRouter.route("/createProduct").post(createproduct);
+productRouter.route("/getProducts").get(AuthenticateUser, getAllProducts);
+var product_default = productRouter;
+
+// src/routes/admin.ts
+var import_express2 = __toESM(require("express"));
+
+// src/controller/admin.ts
+var import_common2 = require("common");
+var import_mongoose4 = __toESM(require("mongoose"));
+var deleteProducts = tryCatchWrapper(async (req, res, next) => {
+  var _a2, _b2;
+  if (!((_a2 = req.body) == null ? void 0 : _a2.deleteProducts))
+    return next(new CustomError("Please Provide Which Product You Want to Delete", 400));
+  const objectIds = (_b2 = req.body) == null ? void 0 : _b2.deleteProducts.map((product2) => new import_mongoose4.default.Types.ObjectId(product2));
+  console.log(objectIds);
+  const isValid = import_common2.deleteProductBody.safeParse(objectIds);
+  if (!isValid.success)
+    return next(new CustomError(isValid.error.errors[0].message, 400));
+  const deleted = await product.deleteMany({ _id: { $in: objectIds } });
+  res.status(201).json({ message: "Products Deleted" });
+});
+
+// src/routes/admin.ts
+var adminRouter = import_express2.default.Router();
+adminRouter.route("/deleteProducts").delete(deleteProducts);
+var admin_default = adminRouter;
+
+// src/routes/user.ts
+var import_express3 = require("express");
 
 // src/controller/user.ts
+var import_common3 = require("common");
 var import_mongoose5 = __toESM(require("mongoose"));
 var import_bcrypt2 = __toESM(require("bcrypt"));
 var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
@@ -311,6 +314,11 @@ var loginUser = tryCatchWrapper(
     });
   }
 );
+var logoutUser = tryCatchWrapper(async (req, res, next) => {
+  res.status(200).clearCookie("fit_wear_token").json({
+    message: "LoggedOut Successfully"
+  });
+});
 var addToCart = tryCatchWrapper(
   async (req, res, next) => {
     const isValid = import_common3.addToCartBody.safeParse(req.body);
@@ -418,6 +426,14 @@ var getUserCart = tryCatchWrapper(
     });
   }
 );
+var getUser = tryCatchWrapper(async (req, res, next) => {
+  const user = req.headers["user"];
+  if (!user)
+    next(new CustomError("You ARe Not LoggedIn", 400));
+  res.status(200).json({
+    user
+  });
+});
 function generateJwtToken(userId, secret_key) {
   const token = import_jsonwebtoken2.default.sign({ _id: userId }, secret_key, {
     expiresIn: "24h"
@@ -430,8 +446,10 @@ var userRouter = (0, import_express3.Router)();
 userRouter.route("/register").post(registerUser);
 userRouter.route("/addToCart").post(addToCart);
 userRouter.route("/deleteFromcart").delete(deleteFromCart);
+userRouter.route("/getUser").get(AuthenticateUser, getUser);
 userRouter.route("/getCartItems").get(getUserCart);
 userRouter.route("/login").post(loginUser);
+userRouter.route("/logout").delete(AuthenticateUser, logoutUser);
 var user_default = userRouter;
 
 // src/index.ts

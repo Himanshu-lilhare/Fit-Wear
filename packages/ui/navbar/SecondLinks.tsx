@@ -1,12 +1,27 @@
+import axios from "axios";
 import Link from "next/link";
-import { useRecoilValue } from "recoil";
-import { isAuthenticatedSelector } from "store";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { isAuthenticatedSelector, serverLink, userAtom } from "store";
 
 const SecondLinks = () => {
   const isAuthenticated = useRecoilValue(isAuthenticatedSelector)
+ const setUser = useSetRecoilState(userAtom)
+async function logoutHandler(){
+  try {
+    const {data} = await axios.delete(`${serverLink}/logout`,{
+   
+      withCredentials:true
+    })
+    setUser({isAuthenticated:false,user:{}})
 
-function logoutHandler(){
-  
+
+  } catch (error) {
+    alert(error)
+  }
+
+ 
+
+
 }
   return (
     <div className="second-links">
