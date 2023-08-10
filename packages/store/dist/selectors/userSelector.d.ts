@@ -1,2 +1,2 @@
-export declare const userValueSelector: import("recoil").RecoilValueReadOnly<{} | import("common").UserDocument>;
+export {};
 //# sourceMappingURL=userSelector.d.ts.map

@@ -30,7 +30,8 @@ interface Review {
   createdAt: Date;
 }
 
-export interface ProductType extends Document {
+export interface ProductType  {
+  _id:string
   name: string;
   description: string;
   price: number;

@@ -18,3 +18,4 @@ __exportStar(require("./atoms/menu"), exports);
 __exportStar(require("./atoms/userAtom"), exports);
 __exportStar(require("./selectors/userSelector"), exports);
 __exportStar(require("./atoms/cartAtom"), exports);
+__exportStar(require("./selectors/cartselector"), exports);

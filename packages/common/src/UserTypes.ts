@@ -1,5 +1,6 @@
 import {z} from "zod"
 import { Document, Schema } from 'mongoose';
+import { Cart } from "./CartTypes";
 
 
 export const registerUserBody = z.object({
@@ -11,7 +12,7 @@ export type RegisterUserType = z.infer<typeof registerUserBody>
 
 // add to cart body
 export const addToCartBody = z.object({
-    userId:z.string(),
+  
     productId:z.string(),
     qty:z.number().int().min(1)
 })
@@ -19,7 +20,7 @@ export type AddToCart = z.infer<typeof addToCartBody>
 
 // delete from cart
 export const deleteFromCartBody = z.object({
-    userId:z.string(),
+   
     productId:z.string(),
  
 })
@@ -40,11 +41,7 @@ interface Address {
   createdAt: Date;
 }
 
-// Define the Cart sub-document type
-interface Cart {
-  oneProduct: Schema.Types.ObjectId;
-  qty?: number;
-}
+
 
 // Define the main User document type
 export interface UserDocument extends Document {

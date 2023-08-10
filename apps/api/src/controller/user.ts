@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { tryCatchWrapper } from "../middleware/tryCatchWrapper";
-import { registerUserBody, addToCartBody, deleteFromCartBody } from "common";
+import { registerUserBody, addToCartBody, deleteFromCartBody, ProductType } from "common";
 import { CustomError } from "../middleware/custumErrorClass";
 import { userModel } from "../model/user";
 import mongoose from "mongoose";
@@ -9,6 +9,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserDocument } from "common";
 import { serialize } from "cookie"
+import { CustomRequest } from "../middleware/Authenticae";
 
 export const registerUser = tryCatchWrapper(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +56,7 @@ export const loginUser = tryCatchWrapper(
   }
 );
 
-export const logoutUser = tryCatchWrapper(  async (req: Request, res: Response, next: NextFunction) => {
+export const logoutUser = tryCatchWrapper(  async (req: CustomRequest, res: Response, next: NextFunction) => {
 
   
   res.status(200).clearCookie("fit_wear_token").json({
@@ -65,14 +66,14 @@ export const logoutUser = tryCatchWrapper(  async (req: Request, res: Response, 
 })
 
 export const addToCart = tryCatchWrapper(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
     const isValid = addToCartBody.safeParse(req.body);
 
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
 
     let user = await userModel.findOne({
-      _id: new mongoose.Types.ObjectId(req.body.userId),
+      _id: new mongoose.Types.ObjectId(req.user?._id),
       cart: {
         $elemMatch: {
           oneProduct: new mongoose.Types.ObjectId(req.body.productId),
@@ -85,7 +86,7 @@ export const addToCart = tryCatchWrapper(
 
     if (!user) {
       let addedTOCart = await userModel.updateOne(
-        { _id: new mongoose.Types.ObjectId(req.body.userId) },
+        { _id: new mongoose.Types.ObjectId(req.user?._id) },
         {
           $push: {
             cart: {
@@ -98,7 +99,7 @@ export const addToCart = tryCatchWrapper(
       if (addedTOCart.modifiedCount === 1)
         return res.status(200).json({ message: "Added To Cart" });
     } else {
-      let user = await userModel.findOne({ _id: req.body.userId });
+      let user = await userModel.findOne({ _id: req.user?._id });
 
       if (!user) {
         return next(new CustomError("User not found.", 404));
@@ -136,15 +137,15 @@ export const addToCart = tryCatchWrapper(
 );
 
 export const deleteFromCart = tryCatchWrapper(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
     const isValid = deleteFromCartBody.safeParse(req.body);
-    const { productId, userId } = req.body;
-
-    if (!productId || !userId) return res.send("kuch bhi mat kar");
+    const { productId } = req.body;
+  
+    if (!productId || !req.user?._id ) return res.send("kuch bhi mat kar");
 
     let user = await userModel.findOneAndUpdate(
       {
-        _id: userId,
+        _id: req.user._id,
         cart: {
           $elemMatch: {
             oneProduct: productId,
@@ -175,23 +176,25 @@ export const deleteFromCart = tryCatchWrapper(
   }
 );
 
+
+
 export const getUserCart = tryCatchWrapper(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.body;
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    let user  = req.user;
+console.log(user+" it is a user")
+    if (!user) return next(new CustomError("You are Not LoggedIn", 400));
 
-    if (!userId) return next(new CustomError("You are Not LoggedIn", 400));
-
-    let user = await userModel.findById(userId).populate("cart.oneProduct");
-    let userCart = user?.cart;
+     user = await userModel.findById(user._id).populate("cart.oneProduct");
+    let userCart  = user?.cart;
     res.status(200).json({
       userCart,
     });
   }
 );
 
-export const getUser = tryCatchWrapper(async (req: Request, res: Response, next: NextFunction) => {
+export const getUser = tryCatchWrapper(async (req: CustomRequest, res: Response, next: NextFunction) => {
 
-  const user = req.headers["user"]
+  const user = req.user
 
   if(!user) next(new CustomError("You ARe Not LoggedIn",400))
 

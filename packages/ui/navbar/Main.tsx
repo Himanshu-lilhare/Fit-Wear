@@ -15,7 +15,7 @@ import { serverLink } from "../ServerLink";
 export const Navbar = () => {
  const setMenu = useSetRecoilState(menuAtom);
   const setUser = useSetRecoilState(userAtom);
-const setCart = useSetRecoilState(cartAtom)
+const setCartItems = useSetRecoilState(cartAtom)
   useEffect(() => {
     async function fetchBaby() {
       try {
@@ -24,7 +24,7 @@ const setCart = useSetRecoilState(cartAtom)
         });
 
         setUser({ isAuthenticated: true, user: data?.user });
-        setCart(data?.user?.cart)
+        setCartItems(data?.user?.cart)
       } catch (error) {
         alert(error);
       }

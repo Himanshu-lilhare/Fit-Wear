@@ -236,7 +236,8 @@ var AuthenticateUser = tryCatchWrapper(
     let user = await userModel.findById({ _id: decoded._id });
     if (!user)
       return next(new CustomError("You are Providning Wrong Token", 400));
-    req.headers["user"] = user;
+    req.user = user;
+    console.log("aaya yaha pe");
     next();
   }
 );
@@ -326,11 +327,12 @@ var logoutUser = tryCatchWrapper(async (req, res, next) => {
 });
 var addToCart = tryCatchWrapper(
   async (req, res, next) => {
+    var _a2, _b2, _c;
     const isValid = import_common3.addToCartBody.safeParse(req.body);
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
     let user = await userModel.findOne({
-      _id: new import_mongoose5.default.Types.ObjectId(req.body.userId),
+      _id: new import_mongoose5.default.Types.ObjectId((_a2 = req.user) == null ? void 0 : _a2._id),
       cart: {
         $elemMatch: {
           oneProduct: new import_mongoose5.default.Types.ObjectId(req.body.productId)
@@ -342,7 +344,7 @@ var addToCart = tryCatchWrapper(
       return next(new CustomError("Product doesnt exist", 400));
     if (!user) {
       let addedTOCart = await userModel.updateOne(
-        { _id: new import_mongoose5.default.Types.ObjectId(req.body.userId) },
+        { _id: new import_mongoose5.default.Types.ObjectId((_b2 = req.user) == null ? void 0 : _b2._id) },
         {
           $push: {
             cart: {
@@ -355,7 +357,7 @@ var addToCart = tryCatchWrapper(
       if (addedTOCart.modifiedCount === 1)
         return res.status(200).json({ message: "Added To Cart" });
     } else {
-      let user2 = await userModel.findOne({ _id: req.body.userId });
+      let user2 = await userModel.findOne({ _id: (_c = req.user) == null ? void 0 : _c._id });
       if (!user2) {
         return next(new CustomError("User not found.", 404));
       }
@@ -385,13 +387,14 @@ var addToCart = tryCatchWrapper(
 );
 var deleteFromCart = tryCatchWrapper(
   async (req, res, next) => {
+    var _a2;
     const isValid = import_common3.deleteFromCartBody.safeParse(req.body);
-    const { productId, userId } = req.body;
-    if (!productId || !userId)
+    const { productId } = req.body;
+    if (!productId || !((_a2 = req.user) == null ? void 0 : _a2._id))
       return res.send("kuch bhi mat kar");
     let user = await userModel.findOneAndUpdate(
       {
-        _id: userId,
+        _id: req.user._id,
         cart: {
           $elemMatch: {
             oneProduct: productId
@@ -421,10 +424,11 @@ var deleteFromCart = tryCatchWrapper(
 );
 var getUserCart = tryCatchWrapper(
   async (req, res, next) => {
-    const { userId } = req.body;
-    if (!userId)
+    let user = req.user;
+    console.log(user + " it is a user");
+    if (!user)
       return next(new CustomError("You are Not LoggedIn", 400));
-    let user = await userModel.findById(userId).populate("cart.oneProduct");
+    user = await userModel.findById(user._id).populate("cart.oneProduct");
     let userCart = user == null ? void 0 : user.cart;
     res.status(200).json({
       userCart
@@ -432,7 +436,7 @@ var getUserCart = tryCatchWrapper(
   }
 );
 var getUser = tryCatchWrapper(async (req, res, next) => {
-  const user = req.headers["user"];
+  const user = req.user;
   if (!user)
     next(new CustomError("You ARe Not LoggedIn", 400));
   res.status(200).json({
@@ -452,7 +456,7 @@ userRouter.route("/register").post(registerUser);
 userRouter.route("/addToCart").post(addToCart);
 userRouter.route("/deleteFromcart").delete(deleteFromCart);
 userRouter.route("/getUser").get(AuthenticateUser, getUser);
-userRouter.route("/getCartItems").get(getUserCart);
+userRouter.route("/getCartItems").get(AuthenticateUser, getUserCart);
 userRouter.route("/login").post(loginUser);
 userRouter.route("/logout").delete(AuthenticateUser, logoutUser);
 var user_default = userRouter;

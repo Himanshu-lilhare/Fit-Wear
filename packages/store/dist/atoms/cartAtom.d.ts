@@ -1,5 +1,4 @@
-import { ProductType } from "common";
-type CartAtomType = Array<ProductType> | [];
-export declare const cartAtom: import("recoil").RecoilState<CartAtomType>;
-export {};
+import { CartItems } from "common";
+export declare const cartAtom: import("recoil").RecoilState<CartItems[]>;
+export declare const cartItemFamily: (param: string) => import("recoil").RecoilState<CartItems>;
 //# sourceMappingURL=cartAtom.d.ts.map
