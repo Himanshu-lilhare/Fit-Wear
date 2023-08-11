@@ -14,9 +14,9 @@ export type RegisterUserType = z.infer<typeof registerUserBody>
 export const addToCartBody = z.object({
   
     productId:z.string(),
-    qty:z.number().int().min(1)
+    qty:z.number().min(1)
 })
-export type AddToCart = z.infer<typeof addToCartBody>
+export type AddToCartFront = z.infer<typeof addToCartBody>
 
 // delete from cart
 export const deleteFromCartBody = z.object({

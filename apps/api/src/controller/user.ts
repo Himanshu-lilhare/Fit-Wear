@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { tryCatchWrapper } from "../middleware/tryCatchWrapper";
-import { registerUserBody, addToCartBody, deleteFromCartBody, ProductType } from "common";
+import {
+  registerUserBody,
+  addToCartBody,
+  deleteFromCartBody,
+  ProductType,
+} from "common";
 import { CustomError } from "../middleware/custumErrorClass";
 import { userModel } from "../model/user";
 import mongoose from "mongoose";
@@ -8,7 +13,7 @@ import { product } from "../model/product";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserDocument } from "common";
-import { serialize } from "cookie"
+import { serialize } from "cookie";
 import { CustomRequest } from "../middleware/Authenticae";
 
 export const registerUser = tryCatchWrapper(
@@ -31,7 +36,7 @@ export const loginUser = tryCatchWrapper(
     if (!email || !password)
       return next(new CustomError("Please Provide Credentials", 400));
 
-    let user : UserDocument | null = await userModel.findOne({ email }).lean()
+    let user: UserDocument | null = await userModel.findOne({ email }).lean();
     if (!user)
       return next(new CustomError("Please Provide Right Credentials", 400));
 
@@ -40,46 +45,51 @@ export const loginUser = tryCatchWrapper(
       return next(new CustomError("Please Provide Right Creedentials", 400));
 
     let token = generateJwtToken(user._id.toString(), process.env.SECRET_KEY!);
-    if(!token) return next(new CustomError("Some Prolbem To make Token",400))
+    if (!token) return next(new CustomError("Some Prolbem To make Token", 400));
 
-    const {password:pass,...userWithoutPassword} = user
+    const { password: pass, ...userWithoutPassword } = user;
 
-    res.setHeader('Set-Cookie',serialize('fit_wear_token',token,{
-      path:'/',
-      httpOnly:true,
-      expires: new Date((Date.now() + 24*60*60*1000))
-  }))
+    res.setHeader(
+      "Set-Cookie",
+      serialize("fit_wear_token", token, {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      })
+    );
     res.status(200).json({
-      message:'loggedin Successfully',
-      user
-    })
+      message: "loggedin Successfully",
+      user,
+    });
   }
 );
 
-export const logoutUser = tryCatchWrapper(  async (req: CustomRequest, res: Response, next: NextFunction) => {
-
-  
-  res.status(200).clearCookie("fit_wear_token").json({
-    message:"LoggedOut Successfully"
-  })
-
-})
+export const logoutUser = tryCatchWrapper(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    res.status(200).clearCookie("fit_wear_token").json({
+      message: "LoggedOut Successfully",
+    });
+  }
+);
 
 export const addToCart = tryCatchWrapper(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
+    console.log(req.body.productId, req.body.qty + " ye hi body");
     const isValid = addToCartBody.safeParse(req.body);
 
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
 
-    let user = await userModel.findOne({
-      _id: new mongoose.Types.ObjectId(req.user?._id),
-      cart: {
-        $elemMatch: {
-          oneProduct: new mongoose.Types.ObjectId(req.body.productId),
+    let user = await userModel
+      .findOne({
+        _id: new mongoose.Types.ObjectId(req.user?._id),
+        cart: {
+          $elemMatch: {
+            oneProduct: new mongoose.Types.ObjectId(req.body.productId),
+          },
         },
-      },
-    });
+      })
+      .populate("cart.oneProduct");
 
     let isProduct = await product.findOne({ _id: req.body.productId });
     if (!isProduct) return next(new CustomError("Product doesnt exist", 400));
@@ -96,17 +106,18 @@ export const addToCart = tryCatchWrapper(
           },
         }
       );
-      if (addedTOCart.modifiedCount === 1)
-        return res.status(200).json({ message: "Added To Cart" });
+      if (addedTOCart.modifiedCount === 1){
+        let user = await userModel
+        .findById(req.user?._id)
+        .populate("cart.oneProduct");
+        return res
+          .status(200)
+          .json({ message: "Added To Cart", userCart: user.cart });
+      } 
     } else {
-      let user = await userModel.findOne({ _id: req.user?._id });
-
-      if (!user) {
-        return next(new CustomError("User not found.", 404));
-      }
+      console.log(user.cart)
       const cartItemIndex: number = user.cart.findIndex(
-        (item: any) =>
-          item.oneProduct.toString() === req.body.productId.toString()
+        (item: any) => item.oneProduct._id.toString() === req.body.productId.toString()
       );
 
       if (cartItemIndex === -1) {
@@ -114,34 +125,21 @@ export const addToCart = tryCatchWrapper(
       }
 
       user.cart[cartItemIndex].qty = req.body.qty;
-
-      let updatedUser = await user.save();
-
-      res.status(200).json({
-        message: "Quantity updated successfully",
-        user: updatedUser,
-      });
-
-      if (!updatedUser) {
-        return next(
-          new CustomError("User not found or product not in cart.", 400)
-        );
-      }
-
-      res.status(200).json({
-        message: "Quantity updated successfully",
-        user: updatedUser,
-      });
+      await user.save();
+      return res
+        .status(200)
+        .json({ message: "Updated Cart", userCart: user.cart });
     }
   }
 );
 
 export const deleteFromCart = tryCatchWrapper(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
-    const isValid = deleteFromCartBody.safeParse(req.body);
-    const { productId } = req.body;
-  
-    if (!productId || !req.user?._id ) return res.send("kuch bhi mat kar");
+    // const isValid = deleteFromCartBody.safeParse(req.body);
+    console.log(req.query.productId);
+    const { productId } = req.query;
+
+    if (!productId || !req.user?._id) return res.send("kuch bhi mat kar");
 
     let user = await userModel.findOneAndUpdate(
       {
@@ -176,38 +174,34 @@ export const deleteFromCart = tryCatchWrapper(
   }
 );
 
-
-
 export const getUserCart = tryCatchWrapper(
   async (req: CustomRequest, res: Response, next: NextFunction) => {
-    let user  = req.user;
-console.log(user+" it is a user")
+    let user = req.user;
+    console.log(user + " it is a user");
     if (!user) return next(new CustomError("You are Not LoggedIn", 400));
 
-     user = await userModel.findById(user._id).populate("cart.oneProduct");
-    let userCart  = user?.cart;
+    user = await userModel.findById(user._id).populate("cart.oneProduct");
+    let userCart = user?.cart;
     res.status(200).json({
       userCart,
     });
   }
 );
 
-export const getUser = tryCatchWrapper(async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getUser = tryCatchWrapper(
+  async (req: CustomRequest, res: Response, next: NextFunction) => {
+    const user = req.user;
 
-  const user = req.user
+    if (!user) next(new CustomError("You ARe Not LoggedIn", 400));
 
-  if(!user) next(new CustomError("You ARe Not LoggedIn",400))
-
-  res.status(200).json({
-    user
-  })
-
-})
-function generateJwtToken(userId: string, secret_key: string):string{
+    res.status(200).json({
+      user,
+    });
+  }
+);
+function generateJwtToken(userId: string, secret_key: string): string {
   const token = jwt.sign({ _id: userId }, secret_key, {
     expiresIn: "24h",
   });
   return token;
 }
-
-

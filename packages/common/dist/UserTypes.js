@@ -10,7 +10,7 @@ exports.registerUserBody = zod_1.z.object({
 // add to cart body
 exports.addToCartBody = zod_1.z.object({
     productId: zod_1.z.string(),
-    qty: zod_1.z.number().int().min(1)
+    qty: zod_1.z.number().min(1)
 });
 // delete from cart
 exports.deleteFromCartBody = zod_1.z.object({

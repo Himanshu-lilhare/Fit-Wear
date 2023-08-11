@@ -2,13 +2,13 @@ import axios from "axios";
 import { UserDocument } from "common";
 import Link from "next/link";
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { cartAtom, isAuthenticatedSelector, userAtom, userValueSelector } from "store";
+import {  cartLength, isAuthenticatedSelector, userAtom } from "store";
 import { serverLink } from "../ServerLink";
 
 const SecondLinks = () => {
   const isAuthenticated = useRecoilValue(isAuthenticatedSelector);
   const setUser = useSetRecoilState(userAtom);
-  const cart = useRecoilValue(cartAtom)
+  const cart_Length = useRecoilValue(cartLength)
   async function logoutHandler() {
     try {
       const { data } = await axios.delete(`${serverLink}/logout`, {
@@ -25,7 +25,7 @@ const SecondLinks = () => {
       {isAuthenticated ? (
         <>
           <Link href={"/cart"}>Cart ({
-           cart?.length
+         cart_Length
           })</Link>
           <Link href={"/Profile"} className="profile-link">
             Profile

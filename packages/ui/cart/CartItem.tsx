@@ -1,37 +1,62 @@
-"use client"
-import { CartItems } from "common";
-import { ChangeEvent } from "react";
-import { useRecoilState } from "recoil";
-import { cartItemFamily } from "store";
+"use client";
+import axios from "axios";
+import { CartItems, AddToCartFront } from "common";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { cartAtom } from "store";
+import { serverLink } from "../ServerLink";
 
-const CartItem = ({ cartItemId }: { cartItemId: string }) => {
-console.log(cartItemId+ ' in cartItem cmponent')
-  const [item,setItem] = useRecoilState(cartItemFamily(cartItemId))
+const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
+  if (!cartItem.qty) return <></>;
+  const setCartItems = useSetRecoilState(cartAtom);
 
-  function handleChange(e:ChangeEvent<HTMLInputElement>){
-   if(isNaN(parseInt(e.target.value))){
-console.log("is nana hai")
-   }
- let qty = parseInt(e.target.value)
- if(item?.qty && item.oneProduct && item){
-
-  setItem((prev:CartItems)=>{
-    return {...prev,qty}!
-   })
- }
-
-
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    if (!e.target.value) {
+      console.log("yaha aaya delete karne");
+      return deleteHandler();
+    }
+    setCartItems((prev) => {
+      let newCartItems = prev.map((item, index) => {
+        if (item._id === cartItem._id) {
+          return { ...item, qty: parseInt(e.target.value) };
+        }
+        return item;
+      });
+      return newCartItems;
+    });
+    
+    
   }
 
-  // if(!(item as CartItems).oneProduct) return <h1>No Product</h1>
- 
+  async function deleteHandler() {
+    setCartItems((prev) => {
+      let newCartItems = prev.filter((item) => {
+        return item._id !== cartItem._id;
+      });
+      return newCartItems;
+    });
+
+    await axios.delete(
+      `${serverLink}/deleteFromCart?productId=${cartItem.oneProduct._id}`,
+      {
+        withCredentials: true,
+      }
+    );
+  }
   return (
     <div className="cart-product">
-      <h1>{(item as CartItems).oneProduct.name}</h1>
-      <p> Price : {(item as CartItems).oneProduct.price}</p>
-      <button className="qty-button">-</button>
-      <input type="number" value={item?.qty} min={1} onChange={handleChange} />
-      <button className="qty-button">+</button>
+      <h1>{cartItem?.oneProduct?.name}</h1>
+      <p> Price : {cartItem?.oneProduct?.price}</p>
+
+      <input
+        className="qty-input"
+        type="number"
+        value={cartItem?.qty}
+        min={1}
+        onChange={handleChange}
+      />
+
+      <button onClick={deleteHandler}>Delete</button>
     </div>
   );
 };

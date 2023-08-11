@@ -24,7 +24,15 @@ const setCartItems = useSetRecoilState(cartAtom)
         });
 
         setUser({ isAuthenticated: true, user: data?.user });
-        setCartItems(data?.user?.cart)
+
+        
+        const { data:data1 } = await axios.get(`${serverLink}/getCartItems`, {
+          withCredentials: true,
+        });
+        if(data1.userCart.length > 0) {
+          setCartItems(data1.userCart);
+        }
+     
       } catch (error) {
         alert(error);
       }

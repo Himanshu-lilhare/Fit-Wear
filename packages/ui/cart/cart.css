@@ -5,3 +5,7 @@
     min-width: 100vw;
     border: 1px solid red;
 }
+.qty-input{
+    font-size: 2.2rem;
+    padding: 0.5rem;
+}

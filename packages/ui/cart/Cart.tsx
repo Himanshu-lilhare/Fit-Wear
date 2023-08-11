@@ -14,21 +14,7 @@ export const Cart = () => {
 
 
 
-  useEffect(() => {
-    async function getCartItems() {
-      try {
-        const { data } = await axios.get(`${serverLink}/getCartItems`, {
-          withCredentials: true,
-        });
-
-        setCartItems(data.userCart);
-      } catch (error:any) {
-        alert(error.response.data.message)
-      }
-    }
-
-    getCartItems();
-  }, []);
+ 
 
 
   if (!cartItems || cartItems.length < 1) return <h1>Cart Is Empty</h1>;
@@ -39,8 +25,8 @@ export const Cart = () => {
         
         return (
           <CartItem
-            key={cartItem._id}
-            cartItemId={cartItem._id}
+            key={index}
+            cartItem={cartItem}
           />
         );
       })}

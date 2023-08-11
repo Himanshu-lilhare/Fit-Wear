@@ -1,5 +1,5 @@
 import express from "express";
-import { json, urlencoded } from "body-parser";
+import  { json } from "body-parser";
 import morgan from "morgan";
 import cors from "cors";
 import dotenv from 'dotenv'
@@ -17,7 +17,13 @@ const app = express();
 app.disable("x-powered-by");
 
 app.use(morgan("dev"));
-app.use(urlencoded({ extended: true }));
+// app.use(bodyParser)
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+
 app.use(json());
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(cookieParser())

@@ -1,18 +1,27 @@
 "use client"
 
-import React from 'react'
+
+import axios from 'axios'
 import { Props } from './Product'
 import { useSetRecoilState } from 'recoil'
 import { cartAtom } from 'store'
+import { serverLink } from '../ServerLink'
 
 const AddToCartButton = ({product}:Props) => {
-const setCart = useSetRecoilState(cartAtom)
-function addToCart(){
+const setCartItems = useSetRecoilState(cartAtom)
+async function addToCart(){
 
-setCart((prev)=>{
-const updatedProducts = [...prev,product]
-return updatedProducts
+const {data} = await axios.post(`${serverLink}/addToCart`,{
+  productId:product._id,
+  qty:1
+},{
+  headers:{
+    "Content-Type":"application/json"
+  },
+  withCredentials:true
 })
+
+setCartItems(data.userCart)
 
 }
   return (

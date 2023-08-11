@@ -309,25 +309,31 @@ var loginUser = tryCatchWrapper(
     if (!token)
       return next(new CustomError("Some Prolbem To make Token", 400));
     const { password: pass, ...userWithoutPassword } = user;
-    res.setHeader("Set-Cookie", (0, import_cookie.serialize)("fit_wear_token", token, {
-      path: "/",
-      httpOnly: true,
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1e3)
-    }));
+    res.setHeader(
+      "Set-Cookie",
+      (0, import_cookie.serialize)("fit_wear_token", token, {
+        path: "/",
+        httpOnly: true,
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1e3)
+      })
+    );
     res.status(200).json({
       message: "loggedin Successfully",
       user
     });
   }
 );
-var logoutUser = tryCatchWrapper(async (req, res, next) => {
-  res.status(200).clearCookie("fit_wear_token").json({
-    message: "LoggedOut Successfully"
-  });
-});
+var logoutUser = tryCatchWrapper(
+  async (req, res, next) => {
+    res.status(200).clearCookie("fit_wear_token").json({
+      message: "LoggedOut Successfully"
+    });
+  }
+);
 var addToCart = tryCatchWrapper(
   async (req, res, next) => {
     var _a2, _b2, _c;
+    console.log(req.body.productId, req.body.qty + " ye hi body");
     const isValid = import_common3.addToCartBody.safeParse(req.body);
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
@@ -338,7 +344,7 @@ var addToCart = tryCatchWrapper(
           oneProduct: new import_mongoose5.default.Types.ObjectId(req.body.productId)
         }
       }
-    });
+    }).populate("cart.oneProduct");
     let isProduct = await product.findOne({ _id: req.body.productId });
     if (!isProduct)
       return next(new CustomError("Product doesnt exist", 400));
@@ -354,42 +360,29 @@ var addToCart = tryCatchWrapper(
           }
         }
       );
-      if (addedTOCart.modifiedCount === 1)
-        return res.status(200).json({ message: "Added To Cart" });
-    } else {
-      let user2 = await userModel.findOne({ _id: (_c = req.user) == null ? void 0 : _c._id });
-      if (!user2) {
-        return next(new CustomError("User not found.", 404));
+      if (addedTOCart.modifiedCount === 1) {
+        let user2 = await userModel.findById((_c = req.user) == null ? void 0 : _c._id).populate("cart.oneProduct");
+        return res.status(200).json({ message: "Added To Cart", userCart: user2.cart });
       }
-      const cartItemIndex = user2.cart.findIndex(
-        (item) => item.oneProduct.toString() === req.body.productId.toString()
+    } else {
+      console.log(user.cart);
+      const cartItemIndex = user.cart.findIndex(
+        (item) => item.oneProduct._id.toString() === req.body.productId.toString()
       );
       if (cartItemIndex === -1) {
         return next(new CustomError("Product not found in cart.", 404));
       }
-      user2.cart[cartItemIndex].qty = req.body.qty;
-      let updatedUser = await user2.save();
-      res.status(200).json({
-        message: "Quantity updated successfully",
-        user: updatedUser
-      });
-      if (!updatedUser) {
-        return next(
-          new CustomError("User not found or product not in cart.", 400)
-        );
-      }
-      res.status(200).json({
-        message: "Quantity updated successfully",
-        user: updatedUser
-      });
+      user.cart[cartItemIndex].qty = req.body.qty;
+      await user.save();
+      return res.status(200).json({ message: "Updated Cart", userCart: user.cart });
     }
   }
 );
 var deleteFromCart = tryCatchWrapper(
   async (req, res, next) => {
     var _a2;
-    const isValid = import_common3.deleteFromCartBody.safeParse(req.body);
-    const { productId } = req.body;
+    console.log(req.query.productId);
+    const { productId } = req.query;
     if (!productId || !((_a2 = req.user) == null ? void 0 : _a2._id))
       return res.send("kuch bhi mat kar");
     let user = await userModel.findOneAndUpdate(
@@ -435,14 +428,16 @@ var getUserCart = tryCatchWrapper(
     });
   }
 );
-var getUser = tryCatchWrapper(async (req, res, next) => {
-  const user = req.user;
-  if (!user)
-    next(new CustomError("You ARe Not LoggedIn", 400));
-  res.status(200).json({
-    user
-  });
-});
+var getUser = tryCatchWrapper(
+  async (req, res, next) => {
+    const user = req.user;
+    if (!user)
+      next(new CustomError("You ARe Not LoggedIn", 400));
+    res.status(200).json({
+      user
+    });
+  }
+);
 function generateJwtToken(userId, secret_key) {
   const token = import_jsonwebtoken2.default.sign({ _id: userId }, secret_key, {
     expiresIn: "24h"
@@ -453,8 +448,8 @@ function generateJwtToken(userId, secret_key) {
 // src/routes/user.ts
 var userRouter = (0, import_express3.Router)();
 userRouter.route("/register").post(registerUser);
-userRouter.route("/addToCart").post(addToCart);
-userRouter.route("/deleteFromcart").delete(deleteFromCart);
+userRouter.route("/addToCart").post(AuthenticateUser, addToCart);
+userRouter.route("/deleteFromcart").delete(AuthenticateUser, deleteFromCart);
 userRouter.route("/getUser").get(AuthenticateUser, getUser);
 userRouter.route("/getCartItems").get(AuthenticateUser, getUserCart);
 userRouter.route("/login").post(loginUser);
@@ -469,7 +464,11 @@ import_dotenv.default.config({
 var app = (0, import_express4.default)();
 app.disable("x-powered-by");
 app.use((0, import_morgan.default)("dev"));
-app.use((0, import_body_parser.urlencoded)({ extended: true }));
+app.use(
+  import_express4.default.urlencoded({
+    extended: true
+  })
+);
 app.use((0, import_body_parser.json)());
 app.use((0, import_cors.default)({ origin: "http://localhost:3000", credentials: true }));
 app.use((0, import_cookie_parser.default)());

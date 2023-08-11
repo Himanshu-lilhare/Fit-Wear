@@ -25,7 +25,7 @@ export declare const addToCartBody: z.ZodObject<{
     productId: string;
     qty: number;
 }>;
-export type AddToCart = z.infer<typeof addToCartBody>;
+export type AddToCartFront = z.infer<typeof addToCartBody>;
 export declare const deleteFromCartBody: z.ZodObject<{
     productId: z.ZodString;
 }, "strip", z.ZodTypeAny, {
