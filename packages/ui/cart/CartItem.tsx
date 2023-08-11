@@ -1,14 +1,31 @@
 "use client";
 import axios from "axios";
-import { CartItems, AddToCartFront } from "common";
-import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { CartItems } from "common";
+import { ChangeEvent } from "react";
+import { useSetRecoilState } from "recoil";
 import { cartAtom } from "store";
 import { serverLink } from "../ServerLink";
+import { debounce } from "lodash";
 
 const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
   if (!cartItem.qty) return <></>;
   const setCartItems = useSetRecoilState(cartAtom);
+
+const debounseApiCall = debounce(async(qty:number)=>{
+
+const {data} = await axios.post(`${serverLink}/addToCart`,{
+  productId:cartItem.oneProduct._id,
+  qty
+},{
+  headers:{
+    "Content-Type":"application/json"
+  },
+  withCredentials:true
+})
+
+setCartItems(data.userCart)
+
+},500)
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.value) {
@@ -24,8 +41,11 @@ const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
       });
       return newCartItems;
     });
+
+    debounseApiCall(parseInt(e.target.value))
+
     
-    
+
   }
 
   async function deleteHandler() {
