@@ -1,31 +1,19 @@
 "use client";
 import axios from "axios";
 import { CartItems } from "common";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import { cartAtom } from "store";
 import { serverLink } from "../ServerLink";
-import { debounce } from "lodash";
+import useDebounce from "../hooks/useDebounce";
+import {useState} from "react"
 
 const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
   if (!cartItem.qty) return <></>;
   const setCartItems = useSetRecoilState(cartAtom);
-
-const debounseApiCall = debounce(async(qty:number)=>{
-
-const {data} = await axios.post(`${serverLink}/addToCart`,{
-  productId:cartItem.oneProduct._id,
-  qty
-},{
-  headers:{
-    "Content-Type":"application/json"
-  },
-  withCredentials:true
-})
-
-setCartItems(data.userCart)
-
-},500)
+  const debounceQty=useDebounce(cartItem.qty,500) 
+  const [blocker,setBlocker]=useState(0)
+  
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.value) {
@@ -41,12 +29,26 @@ setCartItems(data.userCart)
       });
       return newCartItems;
     });
-
-    debounseApiCall(parseInt(e.target.value))
-
-    
-
   }
+  useEffect(()=>{
+ setBlocker(blocker+2)   
+ async function setCart(){
+  const {data} = await axios.post(`${serverLink}/addToCart`,{
+    productId:cartItem.oneProduct._id,
+    qty:debounceQty
+  },{
+    headers:{
+      "Content-Type":"application/json"
+    },
+    withCredentials:true
+  })
+ }
+
+if(debounceQty && blocker > 1){
+    setCart()
+    }
+
+  },[debounceQty])
 
   async function deleteHandler() {
     setCartItems((prev) => {
