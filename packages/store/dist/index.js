@@ -19,3 +19,4 @@ __exportStar(require("./atoms/userAtom"), exports);
 __exportStar(require("./selectors/userSelector"), exports);
 __exportStar(require("./atoms/cartAtom"), exports);
 __exportStar(require("./selectors/cartselector"), exports);
+__exportStar(require("./atoms/addressAtom"), exports);

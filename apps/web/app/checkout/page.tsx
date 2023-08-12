@@ -1,8 +1,11 @@
 import React from 'react'
+import { Checkout } from 'ui'
 
 const page = () => {
   return (
-    <div>Checkout</div>
+    <div className='pad checkout'>
+        <Checkout/>
+    </div>
   )
 }
 

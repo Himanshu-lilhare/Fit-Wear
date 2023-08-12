@@ -23,6 +23,7 @@ html,body{
     padding: 7rem 3rem;
 }
 
+
 @media (max-width:656px) {
    html,body{
     font-size: 7px;
