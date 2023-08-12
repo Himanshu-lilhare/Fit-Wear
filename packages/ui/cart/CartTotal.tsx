@@ -5,7 +5,7 @@ const CartTotal = () => {
   const total = useRecoilValue(cartTotal);
 
   return (
-    <div>
+    <div className="cart-total-div">
       <h1>Total : {total} </h1>
     </div>
   );

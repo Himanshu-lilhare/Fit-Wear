@@ -6,6 +6,23 @@
     border: 1px solid red;
 }
 .qty-input{
-    font-size: 2.2rem;
-    padding: 0.5rem;
+    font-size: 2rem;
+    padding: 0.3rem;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{
+    height: 5rem;
+    width: 5rem;
+}
+.cart-total-div{
+    margin-bottom: 2rem;
+}
+.checkout-link{
+    padding: 1rem;
+    text-decoration: none;
+    background-color: var(--primary-textcolor);
+    color: var(--background-color);
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
 }
