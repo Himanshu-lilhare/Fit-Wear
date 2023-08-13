@@ -45,7 +45,7 @@ interface Review {
     createdAt: Date;
 }
 export interface ProductType {
-    _id: string;
+    _id?: string;
     name: string;
     description: string;
     price: number;
@@ -56,7 +56,7 @@ export interface ProductType {
     category: string;
     seller: string;
     stock: number;
-    ratings: number;
+    ratings?: number;
     reviews?: Review[];
 }
 export {};

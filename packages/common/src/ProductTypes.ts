@@ -10,7 +10,7 @@ export type deleteProductParam = z.infer<typeof deleteProductBody>
 // createProduct
 export const createProductBody = z.object({
     name: z.string().min(1).max(40),
-    description: z.string().min(20),
+    description: z.string().min(10),
     price: z.number().min(0),
     category:  z.enum(["jeans", "t-shirt"]),
     seller: z.string().min(1),
@@ -31,7 +31,7 @@ interface Review {
 }
 
 export interface ProductType  {
-  _id:string
+  _id?:string
   name: string;
   description: string;
   price: number;
@@ -42,6 +42,6 @@ export interface ProductType  {
   category: string;
   seller: string;
   stock: number;
-  ratings: number;
+  ratings?: number;
   reviews?: Review[];
 }
