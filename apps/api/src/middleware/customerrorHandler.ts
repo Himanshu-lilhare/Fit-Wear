@@ -9,7 +9,7 @@ export function CustomErrorHandler(err:CustumError,req:Request,res:Response,next
 
 const statusCode = err.statusCode || 500
 const message = err.message || "Some Internel Error"
-
+console.log(err+ " yaha aagaya yaara ye to")
 res.status(statusCode).json({
     error:message
 })

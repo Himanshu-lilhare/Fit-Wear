@@ -6,8 +6,12 @@ justify-content: center;
 align-items: flex-start;
 gap: 7rem;
 font-size: 20px;
+position: relative;
 }
 .product-div{
     min-height: 25rem;
     min-width: 25rem;
+}
+.add-to-cart-button{
+    cursor: pointer;
 }

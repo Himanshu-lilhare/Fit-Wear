@@ -45,6 +45,7 @@ async function connectDb() {
 function CustomErrorHandler(err, req, res, next) {
   const statusCode = err.statusCode || 500;
   const message = err.message || "Some Internel Error";
+  console.log(err + " yaha aagaya yaara ye to");
   res.status(statusCode).json({
     error: message
   });
@@ -128,30 +129,95 @@ var productSchema = new import_mongoose2.default.Schema({
 var product = import_mongoose2.default.models.product || import_mongoose2.default.model("product", productSchema);
 
 // src/controller/product.ts
-var import_common = require("common");
-var createproduct = tryCatchWrapper(async (req, res, next) => {
-  const isValid = import_common.createProductBody.safeParse(req.body);
-  if (!isValid.success) {
-    return next(new CustomError(isValid.error.errors[0].message.toString(), 400));
-  }
-  console.log("creaproduct karne aaya");
-  const productData = req.body;
-  const createdProduct = await product.create(productData);
-  console.log(createdProduct + "   product create ho gaya");
-  res.status(200).json(createdProduct);
-});
 var getAllProducts = tryCatchWrapper(async (req, res, next) => {
   let products = await product.find({});
   res.status(200).json({ products });
 });
+var getSingleProduct = tryCatchWrapper(async (req, res, next) => {
+  let products = await product.findById(req.params.id);
+  if (!products)
+    return next(new CustomError("Product Doesnt Exist", 400));
+  res.status(200).json({ product: products });
+});
+
+// src/routes/product.ts
+var productRouter = import_express.default.Router();
+productRouter.route("/getProducts").get(getAllProducts);
+productRouter.route("/product/:id").get(getSingleProduct);
+var product_default = productRouter;
+
+// src/routes/admin.ts
+var import_express2 = __toESM(require("express"));
+
+// src/controller/admin.ts
+var import_common = require("common");
+var import_mongoose3 = __toESM(require("mongoose"));
+
+// src/middleware/dataUri.ts
+var import_parser = __toESM(require("datauri/parser.js"));
+var import_path = __toESM(require("path"));
+var getdatauri = (file) => {
+  const parser = new import_parser.default();
+  const extname = import_path.default.extname(file.originalname);
+  return parser.format(extname, file.buffer);
+};
+var dataUri_default = getdatauri;
+
+// src/controller/admin.ts
+var import_cloudinary = __toESM(require("cloudinary"));
+var createproduct = tryCatchWrapper(
+  async (req, res, next) => {
+    var _a2, _b2;
+    req.body.price = parseInt((_a2 = req.body) == null ? void 0 : _a2.price);
+    req.body.stock = parseInt((_b2 = req.body) == null ? void 0 : _b2.stock);
+    const isValid = import_common.createProductBody.safeParse(req.body);
+    if (!isValid.success) {
+      return next(
+        new CustomError(isValid.error.errors[0].message.toString(), 400)
+      );
+    }
+    const productData = req.body;
+    const fileUris = [];
+    for (let file of req.files) {
+      fileUris.push(dataUri_default(file));
+    }
+    let uploadedImages = [];
+    for (let uri of fileUris) {
+      const myCloudImage = await import_cloudinary.default.v2.uploader.upload(uri.content);
+      uploadedImages.unshift({ url: myCloudImage.secure_url, public_id: myCloudImage.public_id });
+    }
+    const productToBeCreate = { ...productData, images: uploadedImages };
+    const createdProduct = await product.create(productToBeCreate);
+    console.log(createdProduct + "   product create ho gaya");
+    res.status(200).json({ createdProduct });
+  }
+);
+var deleteProducts = tryCatchWrapper(
+  async (req, res, next) => {
+    var _a2, _b2;
+    if (!((_a2 = req.body) == null ? void 0 : _a2.deleteProducts))
+      return next(
+        new CustomError("Please Provide Which Product You Want to Delete", 400)
+      );
+    const objectIds = (_b2 = req.body) == null ? void 0 : _b2.deleteProducts.map(
+      (product2) => new import_mongoose3.default.Types.ObjectId(product2)
+    );
+    console.log(objectIds);
+    const isValid = import_common.deleteProductBody.safeParse(objectIds);
+    if (!isValid.success)
+      return next(new CustomError(isValid.error.errors[0].message, 400));
+    const deleted = await product.deleteMany({ _id: { $in: objectIds } });
+    res.status(201).json({ message: "Products Deleted" });
+  }
+);
 
 // src/middleware/Authenticae.ts
 var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
 
 // src/model/user.ts
-var import_mongoose3 = __toESM(require("mongoose"));
+var import_mongoose4 = __toESM(require("mongoose"));
 var import_bcrypt = __toESM(require("bcrypt"));
-var userSchema = new import_mongoose3.default.Schema(
+var userSchema = new import_mongoose4.default.Schema(
   {
     name: {
       type: String,
@@ -193,7 +259,7 @@ var userSchema = new import_mongoose3.default.Schema(
     cart: [
       {
         oneProduct: {
-          type: import_mongoose3.default.Schema.Types.ObjectId,
+          type: import_mongoose4.default.Schema.Types.ObjectId,
           ref: "product"
         },
         qty: {
@@ -218,7 +284,7 @@ userSchema.pre("save", async function(next) {
   next();
 });
 var _a, _b;
-var userModel = ((_b = (_a = import_mongoose3.default) == null ? void 0 : _a.models) == null ? void 0 : _b.user) || import_mongoose3.default.model("user", userSchema);
+var userModel = ((_b = (_a = import_mongoose4.default) == null ? void 0 : _a.models) == null ? void 0 : _b.user) || import_mongoose4.default.model("user", userSchema);
 
 // src/middleware/Authenticae.ts
 var AuthenticateUser = tryCatchWrapper(
@@ -242,48 +308,29 @@ var AuthenticateUser = tryCatchWrapper(
   }
 );
 
-// src/routes/product.ts
-var productRouter = import_express.default.Router();
-productRouter.route("/createProduct").post(createproduct);
-productRouter.route("/getProducts").get(AuthenticateUser, getAllProducts);
-var product_default = productRouter;
-
-// src/routes/admin.ts
-var import_express2 = __toESM(require("express"));
-
-// src/controller/admin.ts
-var import_common2 = require("common");
-var import_mongoose4 = __toESM(require("mongoose"));
-var deleteProducts = tryCatchWrapper(async (req, res, next) => {
-  var _a2, _b2;
-  if (!((_a2 = req.body) == null ? void 0 : _a2.deleteProducts))
-    return next(new CustomError("Please Provide Which Product You Want to Delete", 400));
-  const objectIds = (_b2 = req.body) == null ? void 0 : _b2.deleteProducts.map((product2) => new import_mongoose4.default.Types.ObjectId(product2));
-  console.log(objectIds);
-  const isValid = import_common2.deleteProductBody.safeParse(objectIds);
-  if (!isValid.success)
-    return next(new CustomError(isValid.error.errors[0].message, 400));
-  const deleted = await product.deleteMany({ _id: { $in: objectIds } });
-  res.status(201).json({ message: "Products Deleted" });
-});
+// src/middleware/multer.ts
+var import_multer = __toESM(require("multer"));
+var storage = import_multer.default.memoryStorage();
+var singleupload = (0, import_multer.default)({ storage }).any();
 
 // src/routes/admin.ts
 var adminRouter = import_express2.default.Router();
-adminRouter.route("/deleteProducts").delete(deleteProducts);
+adminRouter.route("/createProduct").post(AuthenticateUser, singleupload, createproduct);
+adminRouter.route("/deleteProducts").delete(AuthenticateUser, deleteProducts);
 var admin_default = adminRouter;
 
 // src/routes/user.ts
 var import_express3 = require("express");
 
 // src/controller/user.ts
-var import_common3 = require("common");
+var import_common2 = require("common");
 var import_mongoose5 = __toESM(require("mongoose"));
 var import_bcrypt2 = __toESM(require("bcrypt"));
 var import_jsonwebtoken2 = __toESM(require("jsonwebtoken"));
 var import_cookie = require("cookie");
 var registerUser = tryCatchWrapper(
   async (req, res, next) => {
-    const isValid = import_common3.registerUserBody.safeParse(req.body);
+    const isValid = import_common2.registerUserBody.safeParse(req.body);
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
     const { email, name, password } = req.body;
@@ -334,7 +381,7 @@ var addToCart = tryCatchWrapper(
   async (req, res, next) => {
     var _a2, _b2, _c;
     console.log(req.body.productId, req.body.qty + " ye hi body");
-    const isValid = import_common3.addToCartBody.safeParse(req.body);
+    const isValid = import_common2.addToCartBody.safeParse(req.body);
     if (!isValid.success)
       return next(new CustomError(isValid.error.errors[0].message, 400));
     let user = await userModel.findOne({
@@ -458,6 +505,7 @@ var user_default = userRouter;
 
 // src/index.ts
 var import_cookie_parser = __toESM(require("cookie-parser"));
+var import_cloudinary2 = __toESM(require("cloudinary"));
 import_dotenv.default.config({
   path: "./src/config/.env"
 });
@@ -483,4 +531,9 @@ app.get("/healthz", (req, res) => {
 });
 app.use(CustomErrorHandler);
 connectDb();
+import_cloudinary2.default.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLIENT_NAME,
+  api_key: process.env.CLOUDINARY_APIKEY,
+  api_secret: process.env.CLOUDINARY_APISECRET
+});
 app.listen(process.env.PORT, () => console.log(`running at port ${process.env.PORT}`));

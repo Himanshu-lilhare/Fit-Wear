@@ -1,0 +1,16 @@
+.single-product{
+    min-height: 85vh;
+    display: flex;
+    width: 100%;
+}
+.select-current-image{
+    object-fit: contain;
+    width: 100px;
+    height: 100px;
+}
+
+.single-product-details-section{
+    width: 100%;
+    border: 1px solid red;
+
+}

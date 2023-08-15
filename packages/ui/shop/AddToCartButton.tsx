@@ -25,7 +25,7 @@ setCartItems(data.userCart)
 
 }
   return (
-   <button onClick={addToCart}>
+   <button className='add-to-cart-button' onClick={addToCart}>
     ADD TO CART
    </button>
   )

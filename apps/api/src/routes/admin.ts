@@ -1,9 +1,12 @@
 import express from "express"
-import { deleteProducts } from "../controller/admin"
+import { createproduct, deleteProducts } from "../controller/admin"
+import { AuthenticateUser } from "../middleware/Authenticae"
+import { singleupload } from "../middleware/multer"
 
 const adminRouter = express.Router()
 
 
-adminRouter.route('/deleteProducts').delete(deleteProducts)
+adminRouter.route('/createProduct').post(AuthenticateUser,singleupload,createproduct)
+adminRouter.route('/deleteProducts').delete(AuthenticateUser,deleteProducts)
 
 export default adminRouter

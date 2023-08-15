@@ -9,6 +9,7 @@ import productRouter from "./routes/product.js";
 import adminRouter from "./routes/admin.js";
 import userRouter from "./routes/user.js";
 import cookieParser from "cookie-parser";
+import cloudinary from "cloudinary"
 dotenv.config({
   path: "./src/config/.env",
 });
@@ -37,6 +38,10 @@ app.get("/healthz", (req, res) => {
   return res.json({ ok: true });
 });
 app.use(CustomErrorHandler)
-connectDb()
-
+connectDb()  
+cloudinary.v2.config({
+  cloud_name:process.env. CLOUDINARY_CLIENT_NAME ,
+  api_key:process.env.CLOUDINARY_APIKEY,
+  api_secret:process.env.CLOUDINARY_APISECRET
+})
 app.listen(process.env.PORT,()=>console.log(`running at port ${process.env.PORT}`))

@@ -44,7 +44,7 @@ export const Checkout = () => {
             <h2>You Have To Pay</h2>
             <h2>{finalTotal}</h2>
           </div>
-          <button className="proceed-to-pay-button">Proceed To Pay</button>
+          <button className="proceed-to-pay-button" >Proceed To Pay</button>
         </footer>
       </div>
       <div className="user-addresses">

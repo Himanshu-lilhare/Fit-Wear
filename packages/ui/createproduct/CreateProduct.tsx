@@ -1,8 +1,9 @@
 "use client";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./create-product.css";
 import { useForm } from "react-hook-form";
-import { ProductType, createProductParams } from "common";
+import axios from "axios";
+import { serverLink } from "../ServerLink";
 
 interface CreateProductFormFields {
   name: string;
@@ -16,12 +17,39 @@ interface CreateProductFormFields {
 
 export const CreateProduct = () => {
   const form = useForm<CreateProductFormFields>();
-  const { register, handleSubmit, formState, watch } = form;
+  const { register, handleSubmit, formState, watch, getValues, setValue } =
+    form;
   const { errors } = formState;
   const [selectedImagesUrls, setSelectedeImagesUrls] = useState<any>();
   const selectedImages = watch("images");
 
-  async function createCourse(data: CreateProductFormFields) {}
+  async function createCourse(data: CreateProductFormFields) {
+    console.log(getValues());
+    try {
+      const { data: response } = await axios.post(
+        `${serverLink}/createProduct`,
+        {
+          name: data.name,
+          description: data.description,
+          category: data.category,
+          seller: data.seller,
+          stock: data.stock,
+          images: data.images,
+          price: data.price,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log(response?.createdProduct);
+    } catch (error: any) {
+      alert(`${error?.response?.data?.message}`);
+    }
+  }
 
   useEffect(() => {
     let urlArray = [];
@@ -31,9 +59,9 @@ export const CreateProduct = () => {
         urlArray.push(URL.createObjectURL(selectedImages[i]));
       }
       setSelectedeImagesUrls(urlArray);
+      console.log(selectedImagesUrls)
     }
   }, [selectedImages]);
-  
 
   return (
     <form
@@ -119,7 +147,6 @@ export const CreateProduct = () => {
       <p style={{ color: "red", fontSize: "2rem" }}>{errors.seller?.message}</p>
 
       <input
-        
         type="file"
         placeholder="Choose Product Images"
         multiple

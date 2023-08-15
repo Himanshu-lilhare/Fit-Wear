@@ -5,7 +5,7 @@ export declare const createProductBody: z.ZodObject<{
     name: z.ZodString;
     description: z.ZodString;
     price: z.ZodNumber;
-    category: z.ZodEnum<["jeans", "t-shirt"]>;
+    category: z.ZodEnum<["jeans", "t-shirts"]>;
     seller: z.ZodString;
     stock: z.ZodNumber;
     ratings: z.ZodOptional<z.ZodNumber>;
@@ -20,7 +20,7 @@ export declare const createProductBody: z.ZodObject<{
     name: string;
     description: string;
     price: number;
-    category: "jeans" | "t-shirt";
+    category: "jeans" | "t-shirts";
     seller: string;
     stock: number;
     ratings?: number | undefined;
@@ -31,7 +31,7 @@ export declare const createProductBody: z.ZodObject<{
     name: string;
     description: string;
     price: number;
-    category: "jeans" | "t-shirt";
+    category: "jeans" | "t-shirts";
     seller: string;
     stock: number;
     ratings?: number | undefined;
@@ -44,15 +44,16 @@ interface Review {
     comment: string;
     createdAt: Date;
 }
+export type Images = {
+    public_id: string;
+    url: string;
+};
 export interface ProductType {
     _id?: string;
     name: string;
     description: string;
     price: number;
-    images?: Array<{
-        public_id: string;
-        url: string;
-    }>;
+    images?: Images[];
     category: string;
     seller: string;
     stock: number;

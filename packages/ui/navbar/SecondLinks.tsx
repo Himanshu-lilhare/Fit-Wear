@@ -1,5 +1,5 @@
 import axios from "axios";
-import { UserDocument } from "common";
+
 import Link from "next/link";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import {  cartLength, isAuthenticatedSelector, userAtom } from "store";
