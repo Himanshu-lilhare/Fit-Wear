@@ -2,10 +2,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { userAtom } from "store";
+import { cartAtom, userAtom } from "store";
 import axios from "axios";
 import { useSetRecoilState } from "recoil";
 import { serverLink } from "../ServerLink";
+import { getCart } from "../apiCalls/cart/getCart";
 
 
 type LoginForm = {
@@ -15,6 +16,7 @@ type LoginForm = {
 
 export const Login = () => {
   const setUser = useSetRecoilState(userAtom);
+  const setCart = useSetRecoilState(cartAtom)
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<LoginForm>();
   const router = useRouter();
@@ -46,6 +48,13 @@ export const Login = () => {
 
       setLoading(false);
       setUser({ isAuthenticated: true, user: res?.data?.user });
+
+      const cartData = await getCart()
+      
+      if(cartData.userCart.length > 0) {
+        setCart(cartData.userCart);
+      }
+
       router.push("/");
     } catch (error) {
       console.log("error");

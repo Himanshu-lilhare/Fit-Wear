@@ -4,8 +4,11 @@
     box-sizing: border-box;
 }
 :root{
-    --primary-textcolor:#E0E0E0;
-    --background-color:#171717;
+    --primary-textcolor:#030303;
+    --background-color:#f4f7f9;
+    --purple-color:#6446e7;
+    --yellow-color:#ffbe13;
+    --pink-color:#f76b4d;
 }
 html,body{
     font-size: 10px;
@@ -16,7 +19,7 @@ html,body{
 }
 
 .border{
-    border: 1px solid white;
+    border: 1px solid black;
 }
 
 .pad{

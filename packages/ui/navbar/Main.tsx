@@ -10,6 +10,7 @@ import { cartAtom, menuAtom, userAtom } from "store";
 import axios from "axios";
 import FirstLinks from "./FirstLinks";
 import { serverLink } from "../ServerLink";
+import { getCart } from "../apiCalls/cart/getCart";
 
 
 export const Navbar = () => {
@@ -26,9 +27,10 @@ const setCartItems = useSetRecoilState(cartAtom)
         setUser({ isAuthenticated: true, user: data?.user });
 
         
-        const { data:data1 } = await axios.get(`${serverLink}/getCartItems`, {
-          withCredentials: true,
-        });
+        // const { data:data1 } = await axios.get(`${serverLink}/getCartItems`, {
+        //   withCredentials: true,
+        // });
+        const data1 = await getCart()
         if(data1.userCart.length > 0) {
           setCartItems(data1.userCart);
         }
