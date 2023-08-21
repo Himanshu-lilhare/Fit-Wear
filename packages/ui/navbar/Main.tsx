@@ -1,7 +1,7 @@
 "use client";
 import "./Navbar.css";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HiMenu } from "react-icons/hi";
 import NavHead from "./NavHead";
 import SecondLinks from "./SecondLinks";
@@ -17,6 +17,7 @@ export const Navbar = () => {
  const setMenu = useSetRecoilState(menuAtom);
   const setUser = useSetRecoilState(userAtom);
 const setCartItems = useSetRecoilState(cartAtom)
+const [sticky,setSticky]=useState(false)
   useEffect(() => {
     async function fetchBaby() {
       try {
@@ -41,10 +42,23 @@ const setCartItems = useSetRecoilState(cartAtom)
     }
 
     fetchBaby();
+
+    window.addEventListener("scroll",()=>{
+         
+    let navbar = document.getElementsByClassName("nav-bar")
+  let navbarBotom = navbar[0].getBoundingClientRect().bottom
+  if(window.scrollY > navbarBotom){
+    setSticky(true)
+  }else{
+    setSticky(false)
+  }
+    
+
+    })
   }, []);
 
   return (
-    <nav style={{width:"100%"}} className="nav-bar">
+    <nav style={{width:"100%"}} className={`nav-bar ${sticky ? "sticky" : ''}`}>
       <div className="nav-wrapper">
         <div className="nav-head-wrapper">
           <span className="menu-icon" onClick={() => setMenu((prev) => !prev)}>

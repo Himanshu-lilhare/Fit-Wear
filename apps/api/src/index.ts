@@ -10,6 +10,7 @@ import adminRouter from "./routes/admin.js";
 import userRouter from "./routes/user.js";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary"
+import Razorpay from "razorpay";
 dotenv.config({
   path: "./src/config/.env",
 });
@@ -44,4 +45,8 @@ cloudinary.v2.config({
   api_key:process.env.CLOUDINARY_APIKEY,
   api_secret:process.env.CLOUDINARY_APISECRET
 })
+export let instance = new Razorpay({
+  key_id:process.env.RAZORPAY_KEYID,
+  key_secret:process.env.RAZORPAY_KEYSECRET,
+});
 app.listen(process.env.PORT,()=>console.log(`running at port ${process.env.PORT}`))

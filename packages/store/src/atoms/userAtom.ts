@@ -3,13 +3,13 @@ import { UserDocument } from "common";
 
 type UserAtomValue = {
   isAuthenticated:boolean  
-  user: UserDocument | {}; // Replace 'Record<string, any>' with the type of your user object
+  user: UserDocument | null; // Replace 'Record<string, any>' with the type of your user object
 };
 export const userAtom = atom<UserAtomValue>({
   key: "userAtom",
   default: {
     isAuthenticated:false,
-    user: {},
+    user: null,
   },
 });
 

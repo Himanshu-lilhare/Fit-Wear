@@ -1,12 +1,17 @@
 .nav-bar {
-  z-index: 4;
+  z-index: 100;
+  position: relative;
+}
+.sticky{
+  position: sticky;
+  top: 0;
 }
 .nav-wrapper {
   display: flex;
   justify-content: space-between;
   padding: 1rem 5rem;
   border: 1px solid white;
-  position: sticky;
+ 
   min-width: 100%;
   background-color: transparent;
   backdrop-filter: blur(0.3rem);
@@ -65,14 +70,14 @@
     width: 100vw;
   }
   .first-links {
-    position: fixed;
+    position: absolute;
     top: 7rem;
     left: 1rem;
     height: 15rem;
     width: 30rem;
     flex-direction: column;
     border: 1px solid white;
-    z-index: 4;
+    z-index: 100;
     background-color: var(--primary-textcolor);
     flex-direction: column;
     justify-content: center;

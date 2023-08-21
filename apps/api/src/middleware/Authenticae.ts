@@ -6,7 +6,7 @@ import { userModel } from "../model/user";
 import { UserDocument } from "common";
 
 export interface CustomRequest extends Request{
-  user?:UserDocument
+  user:UserDocument | null
 }
 
 export const AuthenticateUser = tryCatchWrapper(
