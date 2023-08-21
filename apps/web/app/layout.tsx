@@ -1,6 +1,8 @@
-import { Navbar } from "ui";
+
 import "./globals.css"
 import GlobalProvider from "./GlobalProvider";
+import { Navbar } from "ui";
+
 export default function RootLayout({
   children,
 }: {

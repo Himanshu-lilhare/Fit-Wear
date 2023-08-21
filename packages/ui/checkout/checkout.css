@@ -1,12 +1,12 @@
 .checkout-main{
     width: 100%;
-  height: 87vh;
+  
    overflow-y: scroll;
    padding: 1rem;
 }
 .user-orders-and-total{
     position: relative;
-    height: 51vh;
+    height: 44vh;
     overflow-y: scroll;
 }
 .user-order-and-total-footer{
@@ -35,6 +35,7 @@
 .user-addresses{
     display: flex;
     flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
 
 .address-label{

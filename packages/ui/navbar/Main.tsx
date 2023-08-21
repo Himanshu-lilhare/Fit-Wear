@@ -44,7 +44,7 @@ const setCartItems = useSetRecoilState(cartAtom)
   }, []);
 
   return (
-    <nav>
+    <nav style={{width:"100%"}} className="nav-bar">
       <div className="nav-wrapper">
         <div className="nav-head-wrapper">
           <span className="menu-icon" onClick={() => setMenu((prev) => !prev)}>

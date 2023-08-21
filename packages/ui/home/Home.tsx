@@ -3,13 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 export const Home = () => {
   return (
-    <main className="home border">
-      <section className="left-image-section border">
-        <Image src={"/heroimage.png"} height={600} width={600} alt="djfdh" />
+    <main className="home ">
+      <section className="left-image-section ">
+        <img src={"/heroimage.png"}  alt="djfdh" />
       </section>
-      <section className="right-section border">
-        <div className="right-section-content border">
-        <h1 className="right-section-head">FASHION UP YOR LOOK</h1>
+      <section className="right-section ">
+        <div className="right-section-content ">
+        <h1 className="right-section-head">FASHION UP YOUR LOOK</h1>
 
 <Link  href={"/shop"} className="right-section-shop-link">
   <span>

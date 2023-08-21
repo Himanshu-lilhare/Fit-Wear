@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3000",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -17,6 +17,7 @@
     "recoil": "^0.7.7",
     "ui": "*",
     "store": "*"
+  
   },
   "devDependencies": {
     "@types/node": "^17.0.12",

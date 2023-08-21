@@ -1,7 +1,9 @@
 "use client";
 import "./checkout.css";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { addressAtom, cartAtom, cartTotal } from "store";
+import { useRecoilValue } from "recoil";
+import { cartAtom } from "store";
+import { CheckoutAddress } from "./CheckoutAddress";
+import { CheckoutFooter } from "./CheckoutFooter";
 
 const demoAddress = [
   {
@@ -20,60 +22,40 @@ const demoAddress = [
 
 export const Checkout = () => {
   const cartItems = useRecoilValue(cartAtom);
-  const setAddress = useSetRecoilState(addressAtom);
-  const finalTotal = useRecoilValue(cartTotal);
 
   return (
-    <main className="checkout-main border">
-      <div className="user-orders-and-total border">
-        {cartItems.map((item,index) => {
-          return (
-            <div key={index} className="user-order border">
-              <div className="user-order-name-and-qty">
-                <h1>{item.oneProduct.name}</h1>
-                <p>Qty : {item.qty}</p>
-              </div>
-              <div className="user-order-qty-total">
-                <h2>{item.qty && item.qty * item.oneProduct.price}</h2>
-              </div>
-            </div>
-          );
-        })}
-        <footer className="user-order-and-total-footer">
-          <div className="final-total">
-            <h2>You Have To Pay</h2>
-            <h2>{finalTotal}</h2>
-          </div>
-          <button className="proceed-to-pay-button" >Proceed To Pay</button>
-        </footer>
-      </div>
+    <main className="checkout-main ">
+      <h2 className="font-size-2rem" style={{letterSpacing:"0.3px",marginBottom:"0.5rem"}}>Select Address</h2>
       <div className="user-addresses">
         {demoAddress.map((address, index) => {
           return (
             <>
-              <label key={index} htmlFor="address" className="address-label">
-                <div>
-                  <input
-                    onChange={() => {
-                      setAddress(address);
-                    }}
-                    type="radio"
-                    name="address"
-                    id={`address${index + 1}`}
-                    value={`address${index + 1}`}
-                  />
-                </div>
-
-                <div>
-                  <p>{address.city}</p>
-                  <p>{address.state}</p>
-                  <p>{address.street}</p>
-                  <p>{address.zip}</p>
-                </div>
-              </label>
+              <CheckoutAddress address={address} index={index} />
             </>
           );
         })}
+      </div>
+      <div className="user-orders-and-total ">
+        {cartItems.map((item, index) => {
+          return (
+            <div key={index} className="user-order light-border">
+              <div className="user-order-name-and-qty">
+                <h1 className="font-size-2rem">
+                  {item.oneProduct.description}
+                </h1>
+                <p style={{ fontSize: "1.5rem", fontWeight: "600" }}>
+                  Qty : {item.qty}
+                </p>
+              </div>
+              <div className="user-order-qty-total">
+                <h2 className="font-size-2rem">
+                  {item.qty && item.qty * item.oneProduct.price}
+                </h2>
+              </div>
+            </div>
+          );
+        })}
+        <CheckoutFooter />
       </div>
     </main>
   );

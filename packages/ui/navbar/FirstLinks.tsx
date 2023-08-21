@@ -1,4 +1,4 @@
-import React from 'react'
+"use client"
 import Link from "next/link";
 import { useRecoilValue } from 'recoil';
 import { menuSelector } from 'store';

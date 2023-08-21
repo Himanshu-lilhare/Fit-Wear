@@ -6,6 +6,7 @@
 :root{
     --primary-textcolor:#030303;
     --background-color:#f4f7f9;
+    --background-color-2:rgb(230, 229, 217);
     --purple-color:#6446e7;
     --yellow-color:#ffbe13;
     --pink-color:#f76b4d;
@@ -21,21 +22,66 @@ html,body{
 .border{
     border: 1px solid black;
 }
+.light-border{
+    border: 1px solid rgb(159, 159, 159);
+}
 
 .pad{
     padding: 7rem 3rem;
 }
 
-
+.purple-button{
+    background-color: var(--purple-color);
+    color: var(--background-color) !important;
+    padding: 1rem 1rem !important;
+    font-size: 1.5rem !important;
+    border: none;
+}
+.yellow-button{
+    background-color: var(--yellow-color);
+    color: var(--background-color);
+    padding: 1rem 1rem !important;
+    font-size: 1.5rem !important;
+    border: none;
+}
+.pink-button{
+    background-color: var(--pink-color);
+    color: var(--background-color);
+    padding: 1rem 1rem !important;
+    font-size: 1.5rem !important;
+    border: none;
+}
+.black-button{
+    background-color: var(--black-color);
+    color: var(--background-color);
+    padding: 1rem 1rem !important;
+    font-size: 1.5rem !important;
+    border: none;
+}
+.font-size-1-3rem{
+    font-size: 1.3rem;
+}
+.font-size-1-5rem{
+    font-size: 1.5rem;
+}
+.font-size-1-7rem{
+    font-size: 1.7rem;
+}
+.font-size-2rem{
+    font-size: 2rem;
+}
 @media (max-width:656px) {
    html,body{
-    font-size: 7px;
+    font-size: 8px;
    }
 }
 
 @media (max-width:458px) {
     html,body{
-     font-size: 6px;
+     font-size: 8px;
+    }
+    .pad{
+        padding: 7rem 1rem;
     }
  }
  

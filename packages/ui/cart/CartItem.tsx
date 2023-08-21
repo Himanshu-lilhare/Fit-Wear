@@ -6,14 +6,13 @@ import { useSetRecoilState } from "recoil";
 import { cartAtom } from "store";
 import { serverLink } from "../ServerLink";
 import useDebounce from "../hooks/useDebounce";
-import {useState} from "react"
-
+import { useState } from "react";
+import Image from "next/image";
 const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
   if (!cartItem.qty) return <></>;
   const setCartItems = useSetRecoilState(cartAtom);
-  const debounceQty=useDebounce(cartItem.qty,500) 
-  const [blocker,setBlocker]=useState(0)
-  
+  const debounceQty = useDebounce(cartItem.qty, 500);
+  const [blocker, setBlocker] = useState(0);
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     if (!e.target.value) {
@@ -30,25 +29,28 @@ const CartItem = ({ cartItem }: { cartItem: CartItems }) => {
       return newCartItems;
     });
   }
-  useEffect(()=>{
- setBlocker(blocker+2)   
- async function setCart(){
-  const {data} = await axios.post(`${serverLink}/addToCart`,{
-    productId:cartItem.oneProduct._id,
-    qty:debounceQty
-  },{
-    headers:{
-      "Content-Type":"application/json"
-    },
-    withCredentials:true
-  })
- }
-
-if(debounceQty && blocker > 1){
-    setCart()
+  useEffect(() => {
+    setBlocker(blocker + 2);
+    async function setCart() {
+      const { data } = await axios.post(
+        `${serverLink}/addToCart`,
+        {
+          productId: cartItem.oneProduct._id,
+          qty: debounceQty,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
     }
 
-  },[debounceQty])
+    if (debounceQty && blocker > 1) {
+      setCart();
+    }
+  }, [debounceQty]);
 
   async function deleteHandler() {
     setCartItems((prev) => {
@@ -67,18 +69,36 @@ if(debounceQty && blocker > 1){
   }
   return (
     <div className="cart-product">
-      <h1>{cartItem?.oneProduct?.name}</h1>
-      <p> Price : {cartItem?.oneProduct?.price}</p>
+      <div className="cart-product-image-name-and-input">
+        <Image
+          className="cart-product-image"
+          height={70}
+          width={70}
+          src={
+            cartItem.oneProduct.images
+              ? cartItem.oneProduct.images[0].url
+              : "dfdf"
+          }
+          alt="cartProductImae"
+        />
+        <div>
+          <h1>{cartItem?.oneProduct?.name}</h1>
+          <input
+            className="cart-product-qty-input"
+            type="number"
+            value={cartItem?.qty}
+            min={1}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
 
-      <input
-        className="qty-input"
-        type="number"
-        value={cartItem?.qty}
-        min={1}
-        onChange={handleChange}
-      />
+      <div></div>
+      <div className="cart-product-price-and-delete">
+        <p style={{fontSize:"1.5rem",fontWeight:'600'}}> Price : {cartItem?.oneProduct?.price}</p>
 
-      <button onClick={deleteHandler}>Delete</button>
+        <button  onClick={deleteHandler} className="cart-product-delete-button purple-button">Delete</button>
+      </div>
     </div>
   );
 };

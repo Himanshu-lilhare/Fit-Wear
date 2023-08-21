@@ -3,8 +3,8 @@ import { Cart } from 'ui'
 
 const page = () => {
   return (
-    <main className='pad'>
-<Cart/>
+    <main className='pad' style={{width:"100%"}}>
+     <Cart/>
     </main>
   )
 }
